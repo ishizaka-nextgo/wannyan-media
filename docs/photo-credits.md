@@ -13,3 +13,13 @@
 | cat-on-table.jpg | テーブルの上の猫 | https://unsplash.com/photos/75715CVEJhI |
 | dog-cat-stairs.jpg | 階段にいる白猫とゴールデンレトリバー | https://unsplash.com/photos/h2I1mP0LOZI |
 | dog-treats.jpg | 骨の形のおやつ | https://unsplash.com/photos/w6elADh_jww |
+
+## B案（トップのスライダー）で追加した写真
+
+| ファイル（src/assets/photos/） | 内容 | 出典URL |
+|---|---|---|
+| slide-puppy-sleep.jpg | ベッドで眠るゴールデンレトリバーの子犬 | https://unsplash.com/photos/rzzJan1emGM |
+| slide-cat-sunbath.jpg | 日だまりに座る茶白の猫 | https://unsplash.com/photos/21NRDbMJF94 |
+| slide-senior-lab.jpg | ラグに伏せるシニアのラブラドール | https://unsplash.com/photos/FnMh0z-IeBY |
+| slide-cat-window.jpg | 窓辺で日なたぼっこをする猫 | https://unsplash.com/photos/TsD3-ap897E |
+| slide-dog-curtain.jpg | カーテンに映る犬の影 | https://unsplash.com/photos/NeNf5-byTSk |

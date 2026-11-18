@@ -8,13 +8,13 @@ const { title = 'チェックリスト', items } = Astro.props;
 </div>
 
 <style>
-  .checklist { background: #fff; border: 2px dashed var(--c-primary); border-radius: var(--radius-m); padding: 20px 22px; margin: 32px 0; }
+  .checklist { background: #fff; border: 1px solid var(--c-primary); border-radius: var(--radius-m); padding: 20px 22px; margin: 32px 0; }
   .checklist-title { font-family: var(--font-heading); font-weight: 700; margin: 0 0 8px; }
   ul { list-style: none; padding: 0; margin: 0; }
   li { position: relative; padding-left: 34px; margin: 10px 0; line-height: 1.7; }
   li::before {
     content: ''; position: absolute; left: 0; top: 2px; width: 22px; height: 22px;
-    border-radius: 6px; background: var(--c-primary);
+    border-radius: 2px; background: var(--c-primary);
   }
   li::after {
     content: ''; position: absolute; left: 7px; top: 6px; width: 7px; height: 12px;

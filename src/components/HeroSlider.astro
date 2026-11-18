@@ -1,0 +1,181 @@
+---
+// B案：トップの全画面スライダー。写真をゆっくりズームしながら切り替え、縦書きのコピーを重ねる
+import { Image } from 'astro:assets';
+import puppy from '../assets/photos/slide-puppy-sleep.jpg';
+import catSun from '../assets/photos/slide-cat-sunbath.jpg';
+import seniorLab from '../assets/photos/slide-senior-lab.jpg';
+import catWindow from '../assets/photos/slide-cat-window.jpg';
+import dogCurtain from '../assets/photos/slide-dog-curtain.jpg';
+
+const slides = [
+  { img: puppy, alt: 'ベッドで眠るゴールデンレトリバーの子犬', copy: ['おやすみの顔を、', 'あしたも見られるように。'], label: '毎日のごはん', href: '/category/food/', pos: '60% 50%' },
+  { img: catSun, alt: '日だまりの床に座ってこちらを見る茶白の猫', copy: ['ひだまりの特等席は、', 'いつも、あの子のもの。'], label: '暮らし・住まい', href: '/category/living/', pos: '82% 50%' },
+  { img: seniorLab, alt: 'ラグの上に伏せるシニアのラブラドール', copy: ['ゆっくり歩く日も、', 'となりにいたい。'], label: 'シニアケア', href: '/category/senior/', pos: '72% 50%' },
+  { img: catWindow, alt: '窓辺の日なたで体をのばす猫', copy: ['なにもしない午後が、', 'いちばんのごちそう。'], label: 'シニア猫の食事', href: '/articles/senior-cat-appetite/', pos: '45% 50%' },
+  { img: dogCurtain, alt: 'カーテンに映る垂れ耳の犬の影', copy: ['あの子のことなら、', 'なんでも知りたい。'], label: 'このメディアについて', href: '/about/', pos: '55% 50%' },
+];
+---
+<section class="slider" aria-roledescription="カルーセル" aria-label="ペットのくらし手帖">
+  <div class="slides">
+    {slides.map((s, i) => (
+      <div class={`slide${i === 0 ? ' is-active' : ''}`} role="group" aria-roledescription="スライド" aria-label={`${i + 1} / ${slides.length}`} aria-hidden={i === 0 ? undefined : 'true'}>
+        <Image
+          src={s.img} alt={s.alt} widths={[640, 1080, 1600, 2000]} sizes="100vw"
+          loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'}
+          style={`object-position:${s.pos}`}
+        />
+        <p class="copy">{s.copy.map((l) => <span>{l}</span>)}</p>
+        <a class="slide-link" href={s.href} tabindex={i === 0 ? undefined : -1}>{s.label}<span aria-hidden="true">→</span></a>
+      </div>
+    ))}
+  </div>
+
+  <div class="title">
+    <p class="title-mark" aria-hidden="true">ペットの<br />くらし手帖</p>
+    <h1 class="title-text"><span>ワンニャンハウス</span>ペットのくらし手帖</h1>
+  </div>
+
+  <div class="controls">
+    <ol class="dots">
+      {slides.map((_, i) => (
+        <li><button type="button" class="dot" aria-label={`${i + 1}枚目を表示`} aria-current={i === 0 ? 'true' : undefined} data-i={i}><span></span></button></li>
+      ))}
+    </ol>
+    <button type="button" class="pause" aria-label="スライドを一時停止">
+      <span class="i-pause" aria-hidden="true"></span>
+    </button>
+  </div>
+  <a class="scroll" href="#intro">scroll</a>
+</section>
+
+<script>
+  // 6秒ごとに次の写真へ。一時停止ボタン・ドット・左右スワイプで操作でき、動きを減らす設定の人には自動再生しない
+  const root = document.querySelector<HTMLElement>('.slider');
+  if (root) {
+    const slides = [...root.querySelectorAll<HTMLElement>('.slide')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('.dot')];
+    const pauseBtn = root.querySelector<HTMLButtonElement>('.pause')!;
+    let cur = 0;
+    let timer: number | undefined;
+    let playing = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 2枚目以降の写真は、ページの読み込みが終わってから読み込む（1枚目の表示を速くするため）
+    const ready = () => root.classList.add('ready');
+    if (document.readyState === 'complete') ready(); else addEventListener('load', ready);
+
+    const show = (n: number) => {
+      ready();
+      cur = (n + slides.length) % slides.length;
+      slides.forEach((s, i) => {
+        const on = i === cur;
+        s.classList.toggle('is-active', on);
+        if (on) s.removeAttribute('aria-hidden'); else s.setAttribute('aria-hidden', 'true');
+        s.querySelector('a')!.tabIndex = on ? 0 : -1;
+      });
+      dots.forEach((d, i) => (i === cur ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
+    };
+    const start = () => { stop(); if (playing) timer = window.setInterval(() => show(cur + 1), 6000); };
+    const stop = () => window.clearInterval(timer);
+    const setPlaying = (p: boolean) => {
+      playing = p;
+      root.classList.toggle('is-paused', !p);
+      pauseBtn.setAttribute('aria-label', p ? 'スライドを一時停止' : 'スライドを再生');
+      start();
+    };
+
+    dots.forEach((d) => d.addEventListener('click', () => { show(Number(d.dataset.i)); start(); }));
+    pauseBtn.addEventListener('click', () => setPlaying(!playing));
+    root.addEventListener('focusin', stop);
+    root.addEventListener('focusout', start);
+
+    let x0: number | null = null;
+    root.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+    root.addEventListener('touchend', (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) { show(cur + (dx < 0 ? 1 : -1)); start(); }
+      x0 = null;
+    });
+
+    setPlaying(playing);
+  }
+</script>
+
+<style>
+  .slider { position: relative; height: calc(100svh - 28px); min-height: 560px; max-height: 1000px; overflow: hidden; background: #2a2622; color: #fff; }
+  .slides, .slide { position: absolute; inset: 0; }
+  .slide { opacity: 0; transition: opacity 1.6s ease; }
+  .slide.is-active { opacity: 1; z-index: 1; }
+  .slider:not(.ready) .slide:not(.is-active) { display: none; }
+  .slide :global(img) { width: 100%; height: 100%; object-fit: cover; transform: scale(1.0); }
+  .slide.is-active :global(img) { animation: zoom 9s ease-out forwards; }
+  @keyframes zoom { from { transform: scale(1.0); } to { transform: scale(1.08); } }
+  /* 文字を読みやすくする薄い影 */
+  .slide::after {
+    content: ''; position: absolute; inset: 0;
+    background:
+      linear-gradient(270deg, rgba(0,0,0,.38) 0%, rgba(0,0,0,0) 45%),
+      linear-gradient(180deg, rgba(0,0,0,.3) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 55%, rgba(0,0,0,.5) 100%);
+  }
+
+  .copy {
+    position: absolute; z-index: 2; top: 96px; right: 24px; margin: 0;
+    writing-mode: vertical-rl; font-family: var(--font-display); font-weight: 600;
+    font-size: clamp(1.25rem, 0.9rem + 1.8vw, 2.1rem); line-height: 1.9; letter-spacing: 0.18em;
+    text-shadow: 0 0 2px rgba(0,0,0,.5), 0 1px 14px rgba(0,0,0,.55);
+  }
+  .copy span { display: block; opacity: 0; transform: translateY(-12px); transition: opacity 1.2s ease .5s, transform 1.2s ease .5s; }
+  .copy span + span { margin-top: 3em; transition-delay: .9s; }
+  .slide.is-active .copy span { opacity: 1; transform: none; }
+
+  .slide-link {
+    position: absolute; z-index: 2; left: 20px; bottom: 76px; color: #fff; text-decoration: none;
+    font-size: 0.9375rem; font-weight: 700; letter-spacing: 0.1em; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.7);
+    display: inline-flex; gap: 12px; align-items: center;
+  }
+  .slide-link:hover span { transform: translateX(4px); }
+  .slide-link span { transition: transform .2s; }
+
+  .title { position: absolute; z-index: 3; left: 20px; top: 20px; display: flex; align-items: flex-start; gap: 14px; }
+  .title-mark {
+    margin: 0; background: var(--c-primary); color: var(--c-text); writing-mode: vertical-rl;
+    font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; line-height: 1.5; letter-spacing: 0.15em;
+    padding: 12px 8px; text-align: start;
+  }
+  .title-text { margin: 4px 0 0; font-family: var(--font-display); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.12em; text-shadow: 0 1px 8px rgba(0,0,0,.5); line-height: 1.6; }
+  .title-text span { display: block; font-size: 0.7rem; font-family: var(--font-body); letter-spacing: 0.2em; }
+
+  .controls { position: absolute; z-index: 3; left: 20px; right: 20px; bottom: 20px; display: flex; align-items: center; gap: 16px; }
+  .dots { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; flex: 1; }
+  .dot { width: 44px; height: 44px; padding: 0; background: none; border: 0; cursor: pointer; display: grid; align-items: center; }
+  .dot span { display: block; height: 2px; background: rgba(255,255,255,.45); position: relative; overflow: hidden; }
+  .dot[aria-current] span::after { content: ''; position: absolute; inset: 0; background: #fff; transform-origin: left; animation: progress 6s linear forwards; }
+  .is-paused .dot[aria-current] span::after { animation: none; transform: none; }
+  @keyframes progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  .pause { width: 44px; height: 44px; border: 1px solid rgba(255,255,255,.7); border-radius: 50%; background: rgba(0,0,0,.2); cursor: pointer; display: grid; place-items: center; }
+  .i-pause { width: 10px; height: 12px; border-left: 3px solid #fff; border-right: 3px solid #fff; }
+  .is-paused .i-pause { width: 0; height: 0; border: 0; border-left: 11px solid #fff; border-top: 7px solid transparent; border-bottom: 7px solid transparent; margin-left: 3px; }
+
+  .scroll { display: none; }
+  @media (min-width: 768px) {
+    .copy { top: 120px; right: 8vw; }
+    .slide-link { left: 48px; bottom: 96px; font-size: 1rem; }
+    .title { left: 48px; top: 40px; }
+    .title-mark { font-size: 1.05rem; padding: 16px 10px; }
+    .title-text { font-size: 1.1rem; }
+    .controls { left: 48px; right: 48px; bottom: 32px; }
+    .dots { flex: none; }
+    .dot { width: 64px; }
+    .scroll {
+      display: block; position: absolute; z-index: 3; right: 48px; bottom: 36px; color: #fff; text-decoration: none;
+      writing-mode: vertical-rl; font-size: 0.75rem; letter-spacing: 0.3em; padding-bottom: 64px;
+    }
+    .scroll::after { content: ''; position: absolute; left: 50%; bottom: 0; width: 1px; height: 56px; background: #fff; animation: line 2.2s ease-in-out infinite; transform-origin: top; }
+    @keyframes line { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+    .controls { right: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .copy span { transition: none; }
+    .slide.is-active :global(img), .scroll::after, .dot[aria-current] span::after { animation: none; }
+  }
+</style>

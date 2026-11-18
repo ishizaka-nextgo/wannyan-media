@@ -110,7 +110,7 @@ const share = [
 </Base>
 
 <style>
-  .article { background: #fff; padding-block: 16px 56px; }
+  .article { background: #fff; padding-block: 16px 56px; overflow-x: clip; }
   .breadcrumb ol { display: flex; flex-wrap: wrap; gap: 4px; list-style: none; padding: 0; margin: 0 0 20px; font-size: 0.8125rem; color: var(--c-text-sub); line-height: 1.6; }
   .breadcrumb li:not(:last-child)::after { content: '›'; margin-left: 6px; }
   .breadcrumb a { color: var(--c-text-sub); }
@@ -118,7 +118,7 @@ const share = [
 
   .sample-note { background: var(--c-bg-soft); border: 1px dashed var(--c-primary-shadow); border-radius: var(--radius-s); padding: 8px 14px; font-size: 0.875rem; font-weight: 700; color: var(--c-primary-ink); margin: 0 0 20px; }
 
-  .article-head h1 { font-size: var(--fs-h1); margin: 12px 0 16px; }
+  .article-head h1 { font-size: clamp(1.6rem, 1.25rem + 1.8vw, 2.4rem); line-height: 1.6; letter-spacing: 0.08em; margin: 16px 0 18px; }
   .meta { display: flex; gap: 16px; margin: 14px 0 0; font-size: 0.8125rem; color: var(--c-text-sub); }
   .meta div { display: flex; gap: 6px; }
   .meta dt::after { content: '：'; }
@@ -128,18 +128,18 @@ const share = [
   .people-label { flex: none; font-size: 0.75rem; font-weight: 700; padding: 0 10px; border-radius: var(--radius-pill); background: var(--c-primary); }
   .people-label--sv { background: var(--c-accent-soft); color: var(--c-accent-strong); }
 
-  .hero { margin: 24px calc(var(--gutter) * -1) 0; }
-  .hero :global(img) { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
-  .hero figcaption { font-size: 0.75rem; color: var(--c-text-sub); text-align: right; padding: 4px var(--gutter) 0; }
-  @media (min-width: 760px) { .hero { margin-inline: 0; } .hero :global(img) { border-radius: var(--radius-l); } .hero figcaption { padding-inline: 0; } }
+  /* B案：写真は本文の幅を超えて、画面いっぱいに見せる */
+  .hero { margin: 32px 0 0; width: 100vw; position: relative; left: 50%; transform: translateX(-50%); }
+  .hero :global(img) { width: 100%; aspect-ratio: 3 / 2; max-height: 78vh; object-fit: cover; object-position: 50% 30%; }
+  .hero figcaption { font-size: 0.75rem; color: var(--c-text-sub); text-align: right; padding: 6px var(--gutter) 0; }
 
-  .summary { margin: 28px 0; background: var(--c-bg-soft); border-radius: var(--radius-m); padding: 20px 22px; }
+  .summary { margin: 40px 0 28px; background: var(--c-bg-warm); border-top: 2px solid var(--c-primary); padding: 22px 22px 18px; }
   .summary-title { font-family: var(--font-heading); font-weight: 700; margin: 0 0 8px; color: var(--c-primary-ink); }
   .summary ul { margin: 0; padding-left: 1.3em; }
   .summary li { margin: 4px 0; line-height: 1.75; }
   .summary li::marker { color: var(--c-primary); }
 
-  .toc { border: 2px solid var(--c-line); border-radius: var(--radius-m); padding: 18px 22px; margin: 28px 0 40px; }
+  .toc { border: 1px solid var(--c-line); padding: 20px 22px; margin: 28px 0 48px; }
   .toc-title { font-family: var(--font-heading); font-weight: 700; margin: 0 0 6px; }
   /* 見出し側に番号があるので、目次では番号を付けない */
   .toc ol { margin: 0; padding: 0; list-style: none; }
@@ -151,11 +151,11 @@ const share = [
 
   /* 本文の見出し装飾 */
   .prose :global(h2) {
-    font-size: var(--fs-h2); margin: 56px 0 20px; padding: 14px 18px 14px 20px;
-    background: var(--c-bg-soft); border-radius: var(--radius-label); position: relative; scroll-margin-top: 16px;
+    font-size: var(--fs-h2); margin: 72px 0 24px; padding-bottom: 14px; letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--c-line); position: relative; scroll-margin-top: 110px;
   }
-  .prose :global(h2)::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 5px; border-radius: 0 4px 4px 0; background: var(--c-primary); }
-  .prose :global(h3) { font-size: var(--fs-h3); margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 2px dotted var(--c-primary); scroll-margin-top: 16px; }
+  .prose :global(h2)::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 56px; height: 2px; background: var(--c-primary); }
+  .prose :global(h3) { font-size: var(--fs-h3); margin: 40px 0 12px; padding-left: 14px; border-left: 2px solid var(--c-primary); line-height: 1.6; scroll-margin-top: 110px; }
   .prose :global(p) { margin: 0 0 1.4em; }
   .prose :global(ul), .prose :global(ol) { padding-left: 1.4em; margin: 0 0 1.4em; }
   .prose :global(li) { margin: 6px 0; }
@@ -164,7 +164,7 @@ const share = [
   .prose :global(th), .prose :global(td) { border: 1px solid var(--c-line); padding: 10px 12px; text-align: left; vertical-align: top; line-height: 1.7; }
   .prose :global(th) { background: var(--c-bg-soft); white-space: nowrap; }
 
-  .vet { margin: 48px 0 12px; border: 3px solid var(--c-cat); border-radius: var(--radius-m); padding: 20px 22px; background: #fff7f7; }
+  .vet { margin: 56px 0 12px; border: 1px solid var(--c-cat); border-top-width: 4px; padding: 22px; background: #fff; }
   .vet-title { font-family: var(--font-heading); font-weight: 700; color: var(--c-cat); font-size: 1.15rem; margin: 0 0 4px; }
   .vet p { margin: 0 0 8px; }
   .vet ul { margin: 0; padding-left: 1.3em; }
@@ -174,7 +174,7 @@ const share = [
   .share { text-align: center; margin: 48px 0 40px; }
   .share-title { font-weight: 700; font-size: 0.9375rem; margin: 0 0 12px; }
   .share ul { display: flex; gap: 10px; justify-content: center; list-style: none; padding: 0; margin: 0; }
-  .share-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 96px; min-height: 44px; padding: 8px 16px; border-radius: var(--radius-pill); color: #fff; font-weight: 700; font-size: 0.875rem; text-decoration: none; }
+  .share-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 96px; min-height: 44px; padding: 8px 16px; border-radius: 2px; color: #fff; font-weight: 700; font-size: 0.875rem; text-decoration: none; letter-spacing: 0.05em; }
   .share-btn--x { background: #000; }
   .share-btn--line { background: #05843a; }
   .share-btn--fb { background: #1460c9; }

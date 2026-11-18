@@ -22,14 +22,15 @@
   --c-accent-strong: #3b7a10;  /* 白文字を載せるグリーン（5.3:1） */
   --c-accent-strong-shadow: #2a5a0a;
   --c-text-sub: #5c5249;       /* 補足文字。暖かみのあるグレー */
-  --c-bg-warm: #fffaf3;        /* ページ地のごく薄いクリーム */
+  --c-bg-warm: #faf7f2;        /* B案：生成りの紙のような地色 */
   --c-accent-soft: #eef7e6;
   --c-dog: #4a57c9;            /* --c-male を文字用に濃くした値 */
   --c-cat: #c23f3f;            /* --c-female を文字用に濃くした値 */
 
-  /* 書体：本文は会社サイトと同じ Noto Sans JP。見出しは丸ゴシック（README参照） */
+  /* 書体：本文は会社サイトと同じ Noto Sans JP。B案は見出しとコピーを明朝体にして、写真に合う落ち着きを出す */
   --font-body: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
-  --font-heading: 'Zen Maru Gothic', 'Noto Sans JP', 'Hiragino Maru Gothic ProN', sans-serif;
+  --font-display: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  --font-heading: var(--font-display);
 
   /* 文字サイズ：スマホ優先。本文は 16px 以上 */
   --fs-body: 1.0625rem;  /* 17px */
@@ -40,13 +41,14 @@
   --lh-body: 1.95;
 
   /* 形：会社サイトの傾向（大きめの角丸、片側だけ大きく丸めたラベル、真下 5px の影） */
-  --radius-s: 10px;
-  --radius-m: 18px;
-  --radius-l: 30px;
+  /* B案：写真を主役にするため、角丸は控えめにする */
+  --radius-s: 4px;
+  --radius-m: 6px;
+  --radius-l: 8px;
   --radius-pill: 999px;
-  --radius-label: 30px 15px 15px 15px;
+  --radius-label: 0;
   --btn-shadow-y: 5px;
-  --shadow-card: 0 6px 20px rgba(154, 92, 8, 0.08);
+  --shadow-card: none;
 
   /* 余白 */
   --gutter: 20px;

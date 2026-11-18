@@ -1,54 +1,52 @@
 ---
+// B案のトップ：全画面スライダー → 短い前書き → 写真を大きく使った入口
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import HeroSlider from '../components/HeroSlider.astro';
 import ArticleCard from '../components/ArticleCard.astro';
-import StoreCta from '../components/StoreCta.astro';
 import { SITE, CATEGORIES } from '../data/site';
-import heroImg from '../assets/photos/hero-dog-cat.jpg';
 import imgFood from '../assets/photos/dog-eating-bowl.jpg';
 import imgSenior from '../assets/photos/cat-window.jpg';
 import imgLiving from '../assets/photos/dog-cat-stairs.jpg';
+import catFood from '../assets/photos/dog-eating-bulldog.jpg';
+import catSenior from '../assets/photos/senior-cat-sleeping.jpg';
+import catLiving from '../assets/photos/hero-dog-cat.jpg';
+import storeImg from '../assets/photos/cat-on-table.jpg';
 
 const articles = (await getCollection('articles')).sort((a, b) => +b.data.publishDate - +a.data.publishDate);
-const countBy = (slug: string) => articles.filter((a) => a.data.category === slug).length;
 
 const worries = [
-  { label: '食欲', title: 'ごはんを食べてくれない', text: '好み、環境、体調。理由を一つずつ見直すヒントをまとめました。', href: '/articles/dog-not-eating/', img: imgFood },
-  { label: 'シニア', title: '年をとって食欲が落ちてきた', text: '香りや温度、粒の大きさ。毎日の食事でできる工夫があります。', href: '/articles/senior-cat-appetite/', img: imgSenior },
-  { label: '暮らし', title: '留守番中の過ごし方が心配', text: '室温、いたずら防止、水の置き場所。安心できる部屋づくりを。', href: '/articles/home-alone-room/', img: imgLiving },
+  { no: '01', label: '食欲', title: 'ごはんを、食べてくれない。', text: '好み、環境、体調。理由をひとつずつ見直すヒント。', href: '/articles/dog-not-eating/', img: imgFood },
+  { no: '02', label: 'シニア', title: '年をとって、食が細くなった。', text: '香り、温度、粒の大きさ。毎日の食事でできる工夫。', href: '/articles/senior-cat-appetite/', img: imgSenior },
+  { no: '03', label: '暮らし', title: 'お留守番が、心配。', text: '室温、いたずら防止、水の置き場所。安心の部屋づくり。', href: '/articles/home-alone-room/', img: imgLiving },
 ];
+const catImg: Record<string, ImageMetadata> = { food: catFood, senior: catSenior, living: catLiving };
 const priority = CATEGORIES.filter((c) => c.priority);
 const others = CATEGORIES.filter((c) => !c.priority);
 ---
 <Base>
-  <section class="hero">
-    <div class="container hero-inner">
-      <div class="hero-text">
-        <p class="hero-sub">ワンニャンハウス</p>
-        <h1>ペットの<br class="sp" />くらし手帖</h1>
-        <p class="hero-lead">{SITE.tagline}</p>
-        <a class="btn btn--primary" href="#worries">よく読まれている悩みを見る</a>
-      </div>
-      <div class="hero-img">
-        <Image src={heroImg} alt="床でくつろぐ犬と猫" widths={[480, 800, 1100]} sizes="(min-width: 900px) 540px, 100vw" loading="eager" fetchpriority="high" />
-      </div>
+  <HeroSlider slot="hero" />
+
+  <section class="intro" id="intro">
+    <div class="container narrow">
+      <p class="intro-lead">毎日のごはんから、<br />シニア期の暮らしまで。</p>
+      <p class="intro-text">犬と猫のことを、いちばん近くで見てきた<br class="pc" />ペットショップのスタッフが、やさしくお答えします。</p>
     </div>
   </section>
 
-  <section class="section" id="worries">
+  <section class="section worries-wrap">
     <div class="container">
       <h2 class="sec-title"><small>POPULAR</small>よく読まれている悩み</h2>
-      <ul class="grid grid--3 worries">
+      <ul class="worries">
         {worries.map((w) => (
           <li>
             <a class="worry" href={w.href}>
-              <div class="worry-img"><Image src={w.img} alt="" widths={[400, 720]} sizes="(min-width: 960px) 360px, 100vw" /></div>
+              <Image src={w.img} alt="" widths={[480, 800, 1200]} sizes="(min-width: 960px) 33vw, 100vw" />
               <div class="worry-body">
-                <span class="tag tag--cat-label">{w.label}</span>
+                <span class="worry-no">{w.no}　{w.label}</span>
                 <h3>{w.title}</h3>
                 <p>{w.text}</p>
-                <span class="worry-more">記事を読む</span>
               </div>
             </a>
           </li>
@@ -57,7 +55,7 @@ const others = CATEGORIES.filter((c) => !c.priority);
     </div>
   </section>
 
-  <section class="section section--soft">
+  <section class="section news">
     <div class="container">
       <h2 class="sec-title"><small>NEW</small>新着記事</h2>
       <div class="grid grid--3">{articles.slice(0, 6).map((a) => <ArticleCard article={a} />)}</div>
@@ -71,61 +69,80 @@ const others = CATEGORIES.filter((c) => !c.priority);
         {priority.map((c) => (
           <li>
             <a href={`/category/${c.slug}/`}>
-              <span class="cat-name">{c.name}</span>
-              <span class="cat-lead">{c.lead}</span>
-              <span class="cat-count">{countBy(c.slug)}件の記事</span>
+              <Image src={catImg[c.slug]} alt="" widths={[480, 800]} sizes="(min-width: 768px) 33vw, 100vw" />
+              <span class="cat-text">
+                <span class="cat-name">{c.name}</span>
+                <span class="cat-lead">{c.lead}</span>
+              </span>
             </a>
           </li>
         ))}
       </ul>
       <ul class="cat-sub">
-        {others.map((c) => <li><a href={`/category/${c.slug}/`}>{c.name}</a></li>)}
+        {others.map((c) => <li><a href={`/category/${c.slug}/`}>{c.name}<span aria-hidden="true">→</span></a></li>)}
       </ul>
     </div>
   </section>
 
-  <div class="container narrow"><StoreCta /></div>
+  <section class="store">
+    <Image src={storeImg} alt="" widths={[640, 1080, 1600]} sizes="100vw" class="store-img" />
+    <div class="store-body">
+      <p class="store-title">お近くのワンニャンハウスで、<br />相談できます。</p>
+      <p class="store-text">ごはんのこと、暮らしのこと。ペットのことをよく知るスタッフが、店頭でお話をうかがいます。</p>
+      <div class="store-btns">
+        <a class="btn btn--primary" href={SITE.storesUrl}>店舗一覧を見る（仮リンク）</a>
+        <a class="btn btn--light" href="/contact/">お問い合わせ</a>
+      </div>
+    </div>
+  </section>
 </Base>
 
 <style>
-  .sp { display: inline; }
-  @media (min-width: 640px) { .sp { display: none; } }
+  .pc { display: none; }
+  @media (min-width: 640px) { .pc { display: inline; } }
 
-  .hero { background: var(--c-bg-soft); padding-block: 32px 48px; overflow: hidden; }
-  .hero-inner { display: grid; gap: 28px; align-items: center; }
-  .hero-sub { margin: 0; font-weight: 700; color: var(--c-primary-ink); letter-spacing: 0.15em; font-size: 0.875rem; }
-  .hero h1 { font-size: clamp(2.2rem, 1.6rem + 3vw, 3.4rem); line-height: 1.3; margin: 4px 0 16px; }
-  .hero-lead { font-size: 1.0625rem; margin: 0 0 24px; max-width: 26em; }
-  .hero-img { border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%; overflow: hidden; box-shadow: 0 0 0 10px #fff; }
-  .hero-img :global(img) { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
-  @media (min-width: 900px) {
-    .hero { padding-block: 64px; }
-    .hero-inner { grid-template-columns: 1fr 1fr; gap: 48px; }
-  }
+  .intro { padding-block: 72px 24px; text-align: center; }
+  .intro-lead { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem, 1.1rem + 2vw, 2.25rem); line-height: 1.8; letter-spacing: 0.15em; margin: 0 0 20px; }
+  .intro-text { margin: 0; color: var(--c-text-sub); line-height: 2.2; }
 
-  .worries { list-style: none; padding: 0; margin: 0; }
-  .worry { display: block; height: 100%; background: #fff; border-radius: var(--radius-m); box-shadow: var(--shadow-card); overflow: hidden; color: var(--c-text); text-decoration: none; border: 2px solid transparent; transition: border-color .2s; }
-  .worry:hover { border-color: var(--c-primary); }
-  .worry-img :global(img) { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: 50% 25%; }
-  .worry-body { padding: 18px 20px 22px; }
-  .worry h3 { font-size: 1.2rem; margin: 10px 0 6px; }
-  .worry p { margin: 0 0 12px; font-size: 0.9375rem; color: var(--c-text-sub); line-height: 1.8; }
-  .worry-more { font-weight: 700; color: var(--c-primary-ink); font-size: 0.9375rem; }
-  .worry-more::after { content: ' →'; }
+  .worries { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+  @media (min-width: 960px) { .worries { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+  .worry { position: relative; display: block; overflow: hidden; color: #fff; text-decoration: none; aspect-ratio: 4 / 5; }
+  @media (max-width: 959px) { .worry { aspect-ratio: 4 / 3; } }
+  .worry :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transition: transform 1.2s ease; }
+  .worry:hover :global(img) { transform: scale(1.06); }
+  .worry::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.7) 100%); }
+  .worry-body { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; padding: 24px; }
+  .worry-no { font-size: 0.75rem; letter-spacing: 0.25em; }
+  .worry h3 { font-size: clamp(1.15rem, 1rem + 0.8vw, 1.35rem); margin: 6px 0 6px; letter-spacing: 0.08em; }
+  .worry p { margin: 0; font-size: 0.875rem; line-height: 1.8; opacity: .95; }
 
-  .cat-main { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 16px; }
+  .news { background: #fff; }
+
+  .cat-main { list-style: none; padding: 0; margin: 0 0 32px; display: grid; gap: 16px; }
   @media (min-width: 768px) { .cat-main { grid-template-columns: repeat(3, 1fr); } }
-  .cat-main a {
-    display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 22px 22px 20px;
-    background: var(--c-bg-soft); border-radius: var(--radius-label); color: var(--c-text); text-decoration: none;
-    box-shadow: 0 var(--btn-shadow-y) 0 #f3d5a8; transition: transform .15s, box-shadow .15s;
-  }
-  .cat-main a:hover { transform: translateY(3px); box-shadow: 0 2px 0 #f3d5a8; }
-  .cat-name { font-family: var(--font-heading); font-weight: 700; font-size: 1.15rem; }
-  .cat-lead { font-size: 0.9rem; color: var(--c-text-sub); line-height: 1.7; }
-  .cat-count { font-size: 0.8125rem; font-weight: 700; color: var(--c-primary-ink); margin-top: auto; }
-  .cat-sub { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  @media (min-width: 768px) { .cat-sub { grid-template-columns: repeat(4, 1fr); } }
-  .cat-sub a { display: block; height: 100%; padding: 12px 14px; border: 2px solid var(--c-line); border-radius: var(--radius-s); background: #fff; color: var(--c-text); font-weight: 700; font-size: 0.9rem; text-decoration: none; line-height: 1.5; }
-  .cat-sub a:hover { border-color: var(--c-primary); }
+  .cat-main a { display: block; color: var(--c-text); text-decoration: none; }
+  .cat-main :global(img) { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; transition: opacity .3s; }
+  .cat-main a:hover :global(img) { opacity: .85; }
+  .cat-text { display: block; padding: 14px 2px 0; }
+  .cat-name { display: block; font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; letter-spacing: 0.1em; }
+  .cat-lead { display: block; font-size: 0.875rem; color: var(--c-text-sub); line-height: 1.8; margin-top: 4px; }
+  .cat-sub { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--c-line); display: grid; }
+  @media (min-width: 768px) { .cat-sub { grid-template-columns: repeat(2, 1fr); column-gap: 32px; } }
+  .cat-sub a { display: flex; justify-content: space-between; padding: 16px 4px; border-bottom: 1px solid var(--c-line); color: var(--c-text); text-decoration: none; font-family: var(--font-display); font-weight: 600; letter-spacing: 0.08em; }
+  .cat-sub a:hover { color: var(--c-primary-ink); }
+
+  /* 下のフッターと間を空けずにつなげる */
+  .store { position: relative; min-height: 520px; display: grid; align-items: end; color: #fff; overflow: hidden; margin-top: var(--space-section); margin-bottom: calc(var(--space-section) * -1); }
+  .store :global(.store-img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; }
+  .store::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(20,16,12,0) 30%, rgba(20,16,12,.78) 70%); }
+  @media (max-width: 767px) { .store::after { background: linear-gradient(180deg, rgba(20,16,12,.1) 20%, rgba(20,16,12,.8) 100%); } }
+  .store-body { position: relative; z-index: 1; padding: 40px var(--gutter); max-width: 600px; margin-left: auto; }
+  @media (min-width: 768px) { .store-body { padding: 64px 8vw 64px 0; } .store { align-items: center; } }
+  .store-title { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.35rem, 1.1rem + 1vw, 1.75rem); line-height: 1.8; letter-spacing: 0.1em; margin: 0 0 12px; }
+  .store-text { margin: 0 0 24px; font-size: 0.9375rem; line-height: 2; }
+  .store-btns { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn--light { border: 1px solid #fff; color: #fff; }
+  .btn--light:hover { background: #fff; color: var(--c-text); }
+  @media (max-width: 480px) { .store-btns .btn { flex: 1 1 100%; } }
 </style>

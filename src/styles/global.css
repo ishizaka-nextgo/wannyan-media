@@ -15,7 +15,7 @@ body {
 img { max-width: 100%; height: auto; display: block; }
 a { color: var(--c-primary-ink); text-underline-offset: 3px; }
 a:hover { text-decoration-thickness: 2px; }
-h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 700; line-height: 1.5; letter-spacing: 0.03em; }
+h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; line-height: 1.6; letter-spacing: 0.06em; }
 :focus-visible { outline: 3px solid var(--c-accent-strong); outline-offset: 2px; border-radius: 4px; }
 
 .container { width: 100%; max-width: var(--w-wide); margin-inline: auto; padding-inline: var(--gutter); }
@@ -25,26 +25,27 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 700; line-height
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* セクション見出し：小さな英字ラベル＋丸ゴシック */
-.sec-title { text-align: center; margin: 0 0 32px; font-size: var(--fs-h2); }
+.sec-title { text-align: center; margin: 0 0 40px; font-size: var(--fs-h2); letter-spacing: 0.15em; }
 .sec-title small {
-  display: block; font-family: var(--font-body); font-size: 0.75rem; font-weight: 700;
-  letter-spacing: 0.2em; color: var(--c-primary-ink); margin-bottom: 4px;
+  display: block; font-family: var(--font-body); font-size: 0.7rem; font-weight: 400;
+  letter-spacing: 0.35em; color: var(--c-primary-ink); margin-bottom: 8px;
 }
+.sec-title::after { content: ''; display: block; width: 32px; height: 1px; background: var(--c-text); margin: 16px auto 0; }
 
 /* ボタン：会社サイトと同じ「丸い形＋真下の影」。押すと影の分だけ沈む */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 52px; padding: 12px 28px; border-radius: var(--radius-pill);
+  min-height: 52px; padding: 12px 32px; border-radius: 2px; letter-spacing: 0.1em;
   font-weight: 700; font-size: 1rem; text-decoration: none; text-align: center; line-height: 1.4;
   position: relative; transition: transform .15s, box-shadow .15s;
 }
-.btn:hover { transform: translateY(2px); text-decoration: none; }
-.btn:active { transform: translateY(var(--btn-shadow-y)); box-shadow: none; }
-.btn--primary { background: var(--c-primary); color: var(--c-text); box-shadow: 0 var(--btn-shadow-y) 0 var(--c-primary-shadow); }
-.btn--primary:hover { box-shadow: 0 3px 0 var(--c-primary-shadow); }
-.btn--accent { background: var(--c-accent-strong); color: #fff; box-shadow: 0 var(--btn-shadow-y) 0 var(--c-accent-strong-shadow); }
-.btn--accent:hover { box-shadow: 0 3px 0 var(--c-accent-strong-shadow); }
-.btn--ghost { background: #fff; color: var(--c-primary-ink); border: 2px solid var(--c-primary); }
+.btn:hover { text-decoration: none; }
+.btn--primary { background: var(--c-primary); color: var(--c-text); }
+.btn--primary:hover { background: #ffb44f; }
+.btn--accent { background: var(--c-accent-strong); color: #fff; }
+.btn--accent:hover { background: var(--c-accent-strong-shadow); }
+.btn--ghost { background: transparent; color: var(--c-text); border: 1px solid var(--c-text); }
+.btn--ghost:hover { background: var(--c-text); color: #fff; }
 
 /* タグ */
 .tag {
