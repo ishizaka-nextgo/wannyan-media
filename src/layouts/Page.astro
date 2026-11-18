@@ -1,0 +1,24 @@
+---
+// 固定ページ（このメディアについて・お問い合わせ・プライバシーポリシー・404）の共通枠
+import Base from './Base.astro';
+interface Props { title: string; label?: string; }
+const { title, label } = Astro.props;
+---
+<Base title={title}>
+  <section class="page-head">
+    <div class="container narrow">
+      {label && <p class="label">{label}</p>}
+      <h1>{title}</h1>
+    </div>
+  </section>
+  <div class="container narrow page-body"><slot /></div>
+</Base>
+
+<style>
+  .page-head { background: var(--c-bg-soft); padding-block: 36px; }
+  .label { margin: 0; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.2em; color: var(--c-primary-ink); }
+  h1 { font-size: var(--fs-h1); margin: 4px 0 0; }
+  .page-body { padding-block: 40px 0; }
+  .page-body :global(h2) { font-size: var(--fs-h2); margin: 40px 0 12px; padding-left: 14px; border-left: 5px solid var(--c-primary); }
+  .page-body :global(p) { margin: 0 0 1.2em; }
+</style>

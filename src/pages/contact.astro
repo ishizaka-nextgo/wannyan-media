@@ -1,0 +1,60 @@
+---
+import Page from '../layouts/Page.astro';
+---
+<Page title="お問い合わせ" label="CONTACT">
+  <p>ペットのごはんや暮らしについて、お気軽にご相談ください。</p>
+  <p class="test-note">テストサイトのため、このフォームは送信されません。本番の送信方法は後で決めます。</p>
+
+  <form id="contact-form" class="form" novalidate>
+    <div class="field">
+      <label for="name">お名前<span class="req">必須</span></label>
+      <input id="name" name="name" type="text" autocomplete="name" required />
+    </div>
+    <div class="field">
+      <label for="email">メールアドレス<span class="req">必須</span></label>
+      <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required />
+    </div>
+    <fieldset class="field">
+      <legend>ペットの種類</legend>
+      <div class="radios">
+        <label><input type="radio" name="pet" value="dog" /> 犬</label>
+        <label><input type="radio" name="pet" value="cat" /> 猫</label>
+        <label><input type="radio" name="pet" value="other" /> その他</label>
+      </div>
+    </fieldset>
+    <div class="field">
+      <label for="message">ご相談内容<span class="req">必須</span></label>
+      <textarea id="message" name="message" rows="6" required></textarea>
+    </div>
+    <button type="submit" class="btn btn--primary">送信する</button>
+    <p id="form-result" class="result" role="status" aria-live="polite"></p>
+  </form>
+</Page>
+
+<script>
+  // テストでは送らない。押したら案内を出すだけ
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    document.getElementById('form-result')!.textContent = 'テストサイトのため送信されません。';
+  });
+</script>
+
+<style>
+  .test-note { background: var(--c-bg-soft); border-radius: var(--radius-s); padding: 10px 14px; font-size: 0.9rem; font-weight: 700; color: var(--c-primary-ink); }
+  .form { display: grid; gap: 22px; margin-top: 28px; }
+  .field { display: grid; gap: 8px; border: 0; padding: 0; margin: 0; }
+  label, legend { font-weight: 700; }
+  legend { padding: 0; margin-bottom: 8px; }
+  .req { margin-left: 8px; font-size: 0.75rem; background: var(--c-cat); color: #fff; padding: 1px 8px; border-radius: var(--radius-pill); }
+  input[type='text'], input[type='email'], textarea {
+    width: 100%; font: inherit; font-size: 1rem; padding: 12px 14px; border: 2px solid var(--c-line); border-radius: var(--radius-s); background: #fff;
+  }
+  input:focus, textarea:focus { border-color: var(--c-primary); outline: none; }
+  .radios { display: flex; flex-wrap: wrap; gap: 10px; }
+  .radios label { display: flex; align-items: center; gap: 8px; font-weight: 400; padding: 10px 18px; border: 2px solid var(--c-line); border-radius: var(--radius-pill); background: #fff; cursor: pointer; }
+  .radios label:has(input:checked) { border-color: var(--c-primary); background: var(--c-bg-soft); }
+  .radios input { accent-color: var(--c-primary-ink); width: 18px; height: 18px; }
+  button { justify-self: center; min-width: 240px; border: 0; cursor: pointer; font-family: inherit; }
+  .result { text-align: center; font-weight: 700; color: var(--c-cat); min-height: 1.5em; margin: 0; }
+</style>

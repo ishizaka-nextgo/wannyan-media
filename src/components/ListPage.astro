@@ -1,0 +1,39 @@
+---
+// カテゴリー・タグ一覧の共通部分
+import type { CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ArticleCard from './ArticleCard.astro';
+import StoreCta from './StoreCta.astro';
+
+interface Props { label: string; title: string; lead?: string; articles: CollectionEntry<'articles'>[]; }
+const { label, title, lead, articles } = Astro.props;
+---
+<Base title={title}>
+  <section class="list-head">
+    <div class="container">
+      <nav aria-label="パンくずリスト" class="bc"><a href="/">トップ</a> › {title}</nav>
+      <p class="label">{label}</p>
+      <h1>{title}</h1>
+      {lead && <p class="lead">{lead}</p>}
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <h2 class="visually-hidden">記事一覧</h2>
+      {articles.length > 0
+        ? <div class="grid grid--3">{articles.map((a) => <ArticleCard article={a} />)}</div>
+        : <p class="empty">このカテゴリーの記事は準備中です。本番では記事を順次追加します。</p>}
+    </div>
+  </section>
+  <div class="container narrow"><StoreCta /></div>
+</Base>
+
+<style>
+  .list-head { background: var(--c-bg-soft); padding-block: 20px 36px; }
+  .bc { font-size: 0.8125rem; color: var(--c-text-sub); margin-bottom: 16px; }
+  .bc a { color: var(--c-text-sub); }
+  .label { margin: 0; font-size: 0.8125rem; font-weight: 700; color: var(--c-primary-ink); }
+  h1 { font-size: var(--fs-h1); margin: 4px 0 8px; }
+  .lead { margin: 0; color: var(--c-text-sub); }
+  .empty { text-align: center; background: #fff; border-radius: var(--radius-m); padding: 40px 20px; color: var(--c-text-sub); }
+</style>

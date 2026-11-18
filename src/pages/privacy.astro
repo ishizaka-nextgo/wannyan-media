@@ -1,0 +1,28 @@
+---
+import Page from '../layouts/Page.astro';
+import { SITE } from '../data/site';
+---
+<Page title="プライバシーポリシー" label="PRIVACY POLICY">
+  <p class="draft">これはテストサイト用のひな形です。本番公開前に、{SITE.company}の正式な方針に差し替えてください。</p>
+
+  <p>{SITE.company}（以下「当社」）は、{SITE.name}（以下「本メディア」）における個人情報の取り扱いについて、次のとおり定めます。</p>
+
+  <h2>1. 取得する情報</h2>
+  <p>お問い合わせの際に、お名前、メールアドレス、ご相談内容などをお預かりします。</p>
+
+  <h2>2. 利用の目的</h2>
+  <p>お問い合わせへの回答、店舗でのご相談のご案内のために利用します。</p>
+
+  <h2>3. 第三者への提供</h2>
+  <p>法令にもとづく場合を除き、ご本人の同意なく第三者に提供しません。</p>
+
+  <h2>4. アクセス解析</h2>
+  <p>本番公開時にアクセス解析ツールを導入する場合は、その内容をここに記載します。（テストサイトでは使用していません）</p>
+
+  <h2>5. お問い合わせ窓口</h2>
+  <p>個人情報の取り扱いについてのお問い合わせは、<a href="/contact/">お問い合わせフォーム</a>からご連絡ください。</p>
+</Page>
+
+<style>
+  .draft { background: var(--c-bg-soft); border-radius: var(--radius-s); padding: 10px 14px; font-weight: 700; color: var(--c-primary-ink); }
+</style>

@@ -1,0 +1,131 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import StoreCta from '../components/StoreCta.astro';
+import { SITE, CATEGORIES } from '../data/site';
+import heroImg from '../assets/photos/hero-dog-cat.jpg';
+import imgFood from '../assets/photos/dog-eating-bowl.jpg';
+import imgSenior from '../assets/photos/cat-window.jpg';
+import imgLiving from '../assets/photos/dog-cat-stairs.jpg';
+
+const articles = (await getCollection('articles')).sort((a, b) => +b.data.publishDate - +a.data.publishDate);
+const countBy = (slug: string) => articles.filter((a) => a.data.category === slug).length;
+
+const worries = [
+  { label: '食欲', title: 'ごはんを食べてくれない', text: '好み、環境、体調。理由を一つずつ見直すヒントをまとめました。', href: '/articles/dog-not-eating/', img: imgFood },
+  { label: 'シニア', title: '年をとって食欲が落ちてきた', text: '香りや温度、粒の大きさ。毎日の食事でできる工夫があります。', href: '/articles/senior-cat-appetite/', img: imgSenior },
+  { label: '暮らし', title: '留守番中の過ごし方が心配', text: '室温、いたずら防止、水の置き場所。安心できる部屋づくりを。', href: '/articles/home-alone-room/', img: imgLiving },
+];
+const priority = CATEGORIES.filter((c) => c.priority);
+const others = CATEGORIES.filter((c) => !c.priority);
+---
+<Base>
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <p class="hero-sub">ワンニャンハウス</p>
+        <h1>ペットの<br class="sp" />くらし手帖</h1>
+        <p class="hero-lead">{SITE.tagline}</p>
+        <a class="btn btn--primary" href="#worries">よく読まれている悩みを見る</a>
+      </div>
+      <div class="hero-img">
+        <Image src={heroImg} alt="床でくつろぐ犬と猫" widths={[480, 800, 1100]} sizes="(min-width: 900px) 540px, 100vw" loading="eager" fetchpriority="high" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="worries">
+    <div class="container">
+      <h2 class="sec-title"><small>POPULAR</small>よく読まれている悩み</h2>
+      <ul class="grid grid--3 worries">
+        {worries.map((w) => (
+          <li>
+            <a class="worry" href={w.href}>
+              <div class="worry-img"><Image src={w.img} alt="" widths={[400, 720]} sizes="(min-width: 960px) 360px, 100vw" /></div>
+              <div class="worry-body">
+                <span class="tag tag--cat-label">{w.label}</span>
+                <h3>{w.title}</h3>
+                <p>{w.text}</p>
+                <span class="worry-more">記事を読む</span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--soft">
+    <div class="container">
+      <h2 class="sec-title"><small>NEW</small>新着記事</h2>
+      <div class="grid grid--3">{articles.slice(0, 6).map((a) => <ArticleCard article={a} />)}</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="sec-title"><small>CATEGORY</small>カテゴリーから探す</h2>
+      <ul class="cat-main">
+        {priority.map((c) => (
+          <li>
+            <a href={`/category/${c.slug}/`}>
+              <span class="cat-name">{c.name}</span>
+              <span class="cat-lead">{c.lead}</span>
+              <span class="cat-count">{countBy(c.slug)}件の記事</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <ul class="cat-sub">
+        {others.map((c) => <li><a href={`/category/${c.slug}/`}>{c.name}</a></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <div class="container narrow"><StoreCta /></div>
+</Base>
+
+<style>
+  .sp { display: inline; }
+  @media (min-width: 640px) { .sp { display: none; } }
+
+  .hero { background: var(--c-bg-soft); padding-block: 32px 48px; overflow: hidden; }
+  .hero-inner { display: grid; gap: 28px; align-items: center; }
+  .hero-sub { margin: 0; font-weight: 700; color: var(--c-primary-ink); letter-spacing: 0.15em; font-size: 0.875rem; }
+  .hero h1 { font-size: clamp(2.2rem, 1.6rem + 3vw, 3.4rem); line-height: 1.3; margin: 4px 0 16px; }
+  .hero-lead { font-size: 1.0625rem; margin: 0 0 24px; max-width: 26em; }
+  .hero-img { border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%; overflow: hidden; box-shadow: 0 0 0 10px #fff; }
+  .hero-img :global(img) { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  @media (min-width: 900px) {
+    .hero { padding-block: 64px; }
+    .hero-inner { grid-template-columns: 1fr 1fr; gap: 48px; }
+  }
+
+  .worries { list-style: none; padding: 0; margin: 0; }
+  .worry { display: block; height: 100%; background: #fff; border-radius: var(--radius-m); box-shadow: var(--shadow-card); overflow: hidden; color: var(--c-text); text-decoration: none; border: 2px solid transparent; transition: border-color .2s; }
+  .worry:hover { border-color: var(--c-primary); }
+  .worry-img :global(img) { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: 50% 25%; }
+  .worry-body { padding: 18px 20px 22px; }
+  .worry h3 { font-size: 1.2rem; margin: 10px 0 6px; }
+  .worry p { margin: 0 0 12px; font-size: 0.9375rem; color: var(--c-text-sub); line-height: 1.8; }
+  .worry-more { font-weight: 700; color: var(--c-primary-ink); font-size: 0.9375rem; }
+  .worry-more::after { content: ' →'; }
+
+  .cat-main { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 16px; }
+  @media (min-width: 768px) { .cat-main { grid-template-columns: repeat(3, 1fr); } }
+  .cat-main a {
+    display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 22px 22px 20px;
+    background: var(--c-bg-soft); border-radius: var(--radius-label); color: var(--c-text); text-decoration: none;
+    box-shadow: 0 var(--btn-shadow-y) 0 #f3d5a8; transition: transform .15s, box-shadow .15s;
+  }
+  .cat-main a:hover { transform: translateY(3px); box-shadow: 0 2px 0 #f3d5a8; }
+  .cat-name { font-family: var(--font-heading); font-weight: 700; font-size: 1.15rem; }
+  .cat-lead { font-size: 0.9rem; color: var(--c-text-sub); line-height: 1.7; }
+  .cat-count { font-size: 0.8125rem; font-weight: 700; color: var(--c-primary-ink); margin-top: auto; }
+  .cat-sub { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 768px) { .cat-sub { grid-template-columns: repeat(4, 1fr); } }
+  .cat-sub a { display: block; height: 100%; padding: 12px 14px; border: 2px solid var(--c-line); border-radius: var(--radius-s); background: #fff; color: var(--c-text); font-weight: 700; font-size: 0.9rem; text-decoration: none; line-height: 1.5; }
+  .cat-sub a:hover { border-color: var(--c-primary); }
+</style>

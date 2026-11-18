@@ -1,0 +1,34 @@
+---
+import Page from '../layouts/Page.astro';
+import { SITE } from '../data/site';
+---
+<Page title="このメディアについて" label="ABOUT">
+  <p>{SITE.name}（仮称）は、全国のホームセンター内でペットショップを運営する{SITE.company}のオウンドメディアです。犬や猫と暮らす方の「ちょっと困った」に、ペットショップのスタッフが答えます。</p>
+
+  <h2>運営会社</h2>
+  <dl class="info">
+    <div><dt>会社名</dt><dd>{SITE.company}</dd></div>
+    <div><dt>事業</dt><dd>全国のホームセンター内でのペットショップ運営</dd></div>
+    <div><dt>会社サイト</dt><dd><a href="https://www.wan-nyan-house.com" target="_blank" rel="noopener">https://www.wan-nyan-house.com</a></dd></div>
+  </dl>
+
+  <h2>編集方針</h2>
+  <ul class="policy">
+    <li><strong>スタッフの経験にもとづいて書きます。</strong>店頭でお客様からよくいただく相談をもとに、毎日のお世話に役立つ情報をお届けします。</li>
+    <li><strong>特定のメーカーや商品を否定しません。</strong>ペットに合うものは一頭一頭ちがいます。選ぶときの考え方をお伝えします。</li>
+    <li><strong>診断はしません。</strong>体調についての記事は一般的な情報です。気になる症状があるときは、動物病院にご相談ください。</li>
+  </ul>
+
+  <h2>監修方針</h2>
+  <p>健康やシニアケアに関わる記事の監修体制は、現在調整中です。決まり次第、このページと各記事でお知らせします。</p>
+</Page>
+
+<style>
+  .info { margin: 0; border-top: 1px solid var(--c-line); }
+  .info div { display: grid; grid-template-columns: 7em 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--c-line); }
+  .info dt { font-weight: 700; }
+  .info dd { margin: 0; }
+  .policy { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .policy li { background: #fff; border-radius: var(--radius-m); padding: 16px 20px; box-shadow: var(--shadow-card); }
+  .policy strong { display: block; color: var(--c-primary-ink); font-family: var(--font-heading); }
+</style>

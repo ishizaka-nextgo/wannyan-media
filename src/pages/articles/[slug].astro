@@ -1,0 +1,183 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Tags from '../../components/Tags.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import StoreCta from '../../components/StoreCta.astro';
+import { SITE, categoryName, formatDate } from '../../data/site';
+
+export async function getStaticPaths() {
+  const all = await getCollection('articles');
+  return all.map((article) => ({ params: { slug: article.id }, props: { article, all } }));
+}
+
+const { article, all } = Astro.props;
+const d = article.data;
+const { Content, headings } = await render(article);
+const toc = headings.filter((h) => h.depth <= 3);
+
+// 関連記事：同じカテゴリーを優先し、足りなければ新しい順で補う
+const byDate = all.filter((a) => a.id !== article.id).sort((a, b) => +b.data.publishDate - +a.data.publishDate);
+const related = [...byDate.filter((a) => a.data.category === d.category), ...byDate.filter((a) => a.data.category !== d.category)].slice(0, 3);
+
+const url = new URL(Astro.url.pathname, Astro.site).href;
+const enc = encodeURIComponent;
+const share = [
+  { name: 'X', cls: 'x', href: `https://x.com/intent/post?url=${enc(url)}&text=${enc(d.title)}` },
+  { name: 'LINE', cls: 'line', href: `https://social-plugins.line.me/lineit/share?url=${enc(url)}` },
+  { name: 'Facebook', cls: 'fb', href: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}` },
+];
+---
+<Base title={d.title} description={d.description}>
+  <article class="article">
+    <div class="container narrow">
+      <nav class="breadcrumb" aria-label="パンくずリスト">
+        <ol>
+          <li><a href="/">トップ</a></li>
+          <li><a href={`/category/${d.category}/`}>{categoryName(d.category)}</a></li>
+          <li aria-current="page">{d.title}</li>
+        </ol>
+      </nav>
+
+      {d.sample && <p class="sample-note">この記事はテストサイト用の見本です</p>}
+
+      <header class="article-head">
+        <a class="tag tag--cat-label" href={`/category/${d.category}/`}>{categoryName(d.category)}</a>
+        <h1>{d.title}</h1>
+        <Tags animal={d.animal} ages={d.ages} />
+        <dl class="meta">
+          <div><dt>公開日</dt><dd><time datetime={d.publishDate.toISOString()}>{formatDate(d.publishDate)}</time></dd></div>
+          {d.updatedDate && <div><dt>更新日</dt><dd><time datetime={d.updatedDate.toISOString()}>{formatDate(d.updatedDate)}</time></dd></div>}
+        </dl>
+        <div class="people">
+          <p><span class="people-label">執筆</span>{SITE.author}</p>
+          {d.supervisor && <p><span class="people-label people-label--sv">監修</span>監修者：{d.supervisor}</p>}
+        </div>
+      </header>
+
+      <figure class="hero">
+        <Image src={d.hero} alt={d.heroAlt} widths={[400, 720, 1080]} sizes="(min-width: 760px) 720px, 100vw" loading="eager" fetchpriority="high" />
+        <figcaption>写真は仮素材です（本番で差し替え）</figcaption>
+      </figure>
+
+      <section class="summary" aria-labelledby="summary-title">
+        <p id="summary-title" class="summary-title">この記事でわかること</p>
+        <ul>{d.summary.map((s) => <li>{s}</li>)}</ul>
+      </section>
+
+      {toc.length > 0 && (
+        <nav class="toc" aria-labelledby="toc-title">
+          <p id="toc-title" class="toc-title">目次</p>
+          <ol>
+            {toc.map((h) => <li class={`toc-h${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}
+          </ol>
+        </nav>
+      )}
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      {d.vetSigns && (
+        <>
+          <section class="vet" aria-labelledby="vet-title">
+            <p id="vet-title" class="vet-title">受診の目安</p>
+            <p>次のようなときは、早めに動物病院に相談しましょう。</p>
+            <ul>{d.vetSigns.map((s) => <li>{s}</li>)}</ul>
+          </section>
+          <p class="disclaimer">この記事は一般的な情報です。体調の変化が続くときは動物病院にご相談ください。</p>
+        </>
+      )}
+
+      <div class="share">
+        <p class="share-title">この記事をシェアする</p>
+        <ul>
+          {share.map((s) => <li><a class={`share-btn share-btn--${s.cls}`} href={s.href} target="_blank" rel="noopener noreferrer">{s.name}<span class="visually-hidden">でシェア（新しいタブで開きます）</span></a></li>)}
+        </ul>
+      </div>
+
+      <StoreCta />
+    </div>
+  </article>
+
+  <section class="section section--soft related">
+    <div class="container">
+      <h2 class="sec-title"><small>RELATED</small>あわせて読みたい記事</h2>
+      <div class="grid grid--3">{related.map((a) => <ArticleCard article={a} />)}</div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .article { background: #fff; padding-block: 16px 56px; }
+  .breadcrumb ol { display: flex; flex-wrap: wrap; gap: 4px; list-style: none; padding: 0; margin: 0 0 20px; font-size: 0.8125rem; color: var(--c-text-sub); line-height: 1.6; }
+  .breadcrumb li:not(:last-child)::after { content: '›'; margin-left: 6px; }
+  .breadcrumb a { color: var(--c-text-sub); }
+  .breadcrumb [aria-current] { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; }
+
+  .sample-note { background: var(--c-bg-soft); border: 1px dashed var(--c-primary-shadow); border-radius: var(--radius-s); padding: 8px 14px; font-size: 0.875rem; font-weight: 700; color: var(--c-primary-ink); margin: 0 0 20px; }
+
+  .article-head h1 { font-size: var(--fs-h1); margin: 12px 0 16px; }
+  .meta { display: flex; gap: 16px; margin: 14px 0 0; font-size: 0.8125rem; color: var(--c-text-sub); }
+  .meta div { display: flex; gap: 6px; }
+  .meta dt::after { content: '：'; }
+  .meta dd { margin: 0; }
+  .people { margin-top: 14px; padding: 12px 16px; background: var(--c-bg-warm); border-radius: var(--radius-s); font-size: 0.875rem; }
+  .people p { margin: 2px 0; display: flex; align-items: center; gap: 10px; }
+  .people-label { flex: none; font-size: 0.75rem; font-weight: 700; padding: 0 10px; border-radius: var(--radius-pill); background: var(--c-primary); }
+  .people-label--sv { background: var(--c-accent-soft); color: var(--c-accent-strong); }
+
+  .hero { margin: 24px calc(var(--gutter) * -1) 0; }
+  .hero :global(img) { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+  .hero figcaption { font-size: 0.75rem; color: var(--c-text-sub); text-align: right; padding: 4px var(--gutter) 0; }
+  @media (min-width: 760px) { .hero { margin-inline: 0; } .hero :global(img) { border-radius: var(--radius-l); } .hero figcaption { padding-inline: 0; } }
+
+  .summary { margin: 28px 0; background: var(--c-bg-soft); border-radius: var(--radius-m); padding: 20px 22px; }
+  .summary-title { font-family: var(--font-heading); font-weight: 700; margin: 0 0 8px; color: var(--c-primary-ink); }
+  .summary ul { margin: 0; padding-left: 1.3em; }
+  .summary li { margin: 4px 0; line-height: 1.75; }
+  .summary li::marker { color: var(--c-primary); }
+
+  .toc { border: 2px solid var(--c-line); border-radius: var(--radius-m); padding: 18px 22px; margin: 28px 0 40px; }
+  .toc-title { font-family: var(--font-heading); font-weight: 700; margin: 0 0 6px; }
+  /* 見出し側に番号があるので、目次では番号を付けない */
+  .toc ol { margin: 0; padding: 0; list-style: none; }
+  .toc li { margin: 8px 0; line-height: 1.6; font-size: 0.9375rem; padding-left: 1.1em; position: relative; }
+  .toc li::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 7px; height: 7px; border-radius: 50%; background: var(--c-primary); }
+  .toc-h3 { margin-left: 1.2em !important; font-size: 0.875rem !important; }
+  .toc-h3::before { background: var(--c-line) !important; }
+  .toc a { color: var(--c-text); }
+
+  /* 本文の見出し装飾 */
+  .prose :global(h2) {
+    font-size: var(--fs-h2); margin: 56px 0 20px; padding: 14px 18px 14px 20px;
+    background: var(--c-bg-soft); border-radius: var(--radius-label); position: relative; scroll-margin-top: 16px;
+  }
+  .prose :global(h2)::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 5px; border-radius: 0 4px 4px 0; background: var(--c-primary); }
+  .prose :global(h3) { font-size: var(--fs-h3); margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 2px dotted var(--c-primary); scroll-margin-top: 16px; }
+  .prose :global(p) { margin: 0 0 1.4em; }
+  .prose :global(ul), .prose :global(ol) { padding-left: 1.4em; margin: 0 0 1.4em; }
+  .prose :global(li) { margin: 6px 0; }
+  .prose :global(strong) { background: linear-gradient(transparent 62%, #ffe0b3 62%); font-weight: 700; }
+  .prose :global(table) { width: 100%; border-collapse: collapse; margin: 0 0 1.6em; font-size: 0.9375rem; }
+  .prose :global(th), .prose :global(td) { border: 1px solid var(--c-line); padding: 10px 12px; text-align: left; vertical-align: top; line-height: 1.7; }
+  .prose :global(th) { background: var(--c-bg-soft); white-space: nowrap; }
+
+  .vet { margin: 48px 0 12px; border: 3px solid var(--c-cat); border-radius: var(--radius-m); padding: 20px 22px; background: #fff7f7; }
+  .vet-title { font-family: var(--font-heading); font-weight: 700; color: var(--c-cat); font-size: 1.15rem; margin: 0 0 4px; }
+  .vet p { margin: 0 0 8px; }
+  .vet ul { margin: 0; padding-left: 1.3em; }
+  .vet li { margin: 4px 0; line-height: 1.75; }
+  .disclaimer { font-size: 0.875rem; color: var(--c-text-sub); margin: 0 0 40px; }
+
+  .share { text-align: center; margin: 48px 0 40px; }
+  .share-title { font-weight: 700; font-size: 0.9375rem; margin: 0 0 12px; }
+  .share ul { display: flex; gap: 10px; justify-content: center; list-style: none; padding: 0; margin: 0; }
+  .share-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 96px; min-height: 44px; padding: 8px 16px; border-radius: var(--radius-pill); color: #fff; font-weight: 700; font-size: 0.875rem; text-decoration: none; }
+  .share-btn--x { background: #000; }
+  .share-btn--line { background: #05843a; }
+  .share-btn--fb { background: #1460c9; }
+
+  .related { padding-block: 56px; }
+</style>

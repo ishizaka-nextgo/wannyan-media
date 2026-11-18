@@ -1,0 +1,114 @@
+---
+import '../styles/global.css';
+import { SITE, CATEGORIES } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = SITE.tagline } = Astro.props;
+const pageTitle = title ? `${title} | ${SITE.name}` : SITE.name;
+const path = Astro.url.pathname;
+const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Zen+Maru+Gothic:wght@500;700&display=swap';
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- テストサイトのため検索エンジンに載せない（本番で外す） -->
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- 日本語フォントのCSSは大きく描画を止めるため、後から読み込む（その間は端末の標準書体で表示） -->
+    <link rel="preload" as="style" href={FONTS} />
+    <link rel="stylesheet" href={FONTS} media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href={FONTS} /></noscript>
+  </head>
+  <body>
+    <div class="test-band" role="note">テストサイト（公開前の確認用）</div>
+    <a class="skip" href="#main">本文へスキップ</a>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="logo" href="/" aria-label={`${SITE.name} トップへ`}>
+          <svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="var(--c-primary)"/><g fill="#fff"><ellipse cx="20" cy="25" rx="7" ry="6"/><circle cx="11.5" cy="17" r="3.2"/><circle cx="17" cy="11.5" r="3.2"/><circle cx="23" cy="11.5" r="3.2"/><circle cx="28.5" cy="17" r="3.2"/></g></svg>
+          <span class="logo-text"><small>ワンニャンハウス</small>ペットのくらし手帖</span>
+        </a>
+        <nav class="header-links" aria-label="サイト情報">
+          <a href="/about/">このメディアについて</a>
+          <a href="/contact/" class="btn btn--primary header-cta">お問い合わせ</a>
+        </nav>
+      </div>
+      <nav class="cat-nav" aria-label="カテゴリー">
+        <ul class="container">
+          {CATEGORIES.map((c) => {
+            const href = `/category/${c.slug}/`;
+            return <li><a href={href} aria-current={path === href ? 'page' : undefined}>{c.name}</a></li>;
+          })}
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main"><slot /></main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p class="footer-logo">{SITE.name}<span>（仮称）</span></p>
+        <p class="footer-lead">{SITE.tagline}</p>
+        <ul class="footer-links">
+          <li><a href="/about/">このメディアについて</a></li>
+          <li><a href="/contact/">お問い合わせ</a></li>
+          <li><a href="/privacy/">プライバシーポリシー</a></li>
+          <li><a href={SITE.storesUrl}>店舗一覧（仮リンク）</a></li>
+        </ul>
+        <p class="copy"><small>&copy; {SITE.company}　写真はテスト用の仮素材です。</small></p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .test-band {
+    background: var(--c-text); color: #fff; text-align: center;
+    font-size: 0.8125rem; font-weight: 700; padding: 4px 8px; letter-spacing: 0.08em;
+  }
+  .skip { position: absolute; left: -9999px; }
+  .skip:focus { left: 8px; top: 8px; z-index: 10; background: #fff; padding: 8px 12px; }
+
+  .site-header { background: #fff; border-bottom: 1px solid var(--c-line); }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--c-text); }
+  .logo-mark { width: 40px; height: 40px; flex: none; }
+  .logo-text { font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; line-height: 1.3; white-space: nowrap; }
+  @media (min-width: 768px) { .logo-text { font-size: 1.25rem; } }
+  .logo-text small { display: block; font-size: 0.7rem; color: var(--c-primary-ink); letter-spacing: 0.1em; }
+  .header-links { display: flex; align-items: center; gap: 20px; font-size: 0.9rem; }
+  .header-links > a:not(.btn) { display: none; color: var(--c-text); text-decoration: none; font-weight: 700; }
+  .header-cta { min-height: 44px; padding: 8px 14px; font-size: 0.8125rem; white-space: nowrap; }
+  .logo-mark { width: 36px; height: 36px; }
+  @media (min-width: 768px) { .header-links > a:not(.btn) { display: inline; } }
+
+  /* カテゴリーはスマホでは横スクロールのチップにする（JSなし） */
+  .cat-nav ul {
+    display: flex; gap: 8px; list-style: none; margin: 0; padding-block: 0 12px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .cat-nav li { flex: none; }
+  .cat-nav a {
+    display: block; padding: 6px 14px; border-radius: var(--radius-pill); background: var(--c-bg-soft);
+    color: var(--c-text); font-size: 0.875rem; font-weight: 700; text-decoration: none; white-space: nowrap;
+  }
+  .cat-nav a[aria-current='page'], .cat-nav a:hover { background: var(--c-primary); }
+
+  .site-footer { background: #fff; border-top: 4px solid var(--c-primary); margin-top: var(--space-section); padding-block: 48px 32px; }
+  .footer-logo { font-family: var(--font-heading); font-weight: 700; font-size: 1.15rem; margin: 0; }
+  .footer-logo span { font-size: 0.8rem; color: var(--c-text-sub); }
+  .footer-lead { font-size: var(--fs-small); color: var(--c-text-sub); margin: 4px 0 20px; }
+  .footer-links { display: flex; flex-wrap: wrap; gap: 8px 24px; list-style: none; padding: 0; margin: 0 0 24px; font-size: 0.9rem; }
+  .footer-links a { color: var(--c-text); }
+  .copy { color: var(--c-text-sub); margin: 0; }
+</style>

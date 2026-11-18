@@ -1,0 +1,13 @@
+---
+import { getCollection } from 'astro:content';
+import ListPage from '../../components/ListPage.astro';
+import { CATEGORIES } from '../../data/site';
+
+export function getStaticPaths() {
+  return CATEGORIES.map((c) => ({ params: { slug: c.slug }, props: { cat: c } }));
+}
+const { cat } = Astro.props;
+const articles = (await getCollection('articles', (a) => a.data.category === cat.slug))
+  .sort((a, b) => +b.data.publishDate - +a.data.publishDate);
+---
+<ListPage label="カテゴリー" title={cat.name} lead={cat.lead} articles={articles} />

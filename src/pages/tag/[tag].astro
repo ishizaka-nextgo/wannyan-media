@@ -1,0 +1,17 @@
+---
+import { getCollection } from 'astro:content';
+import ListPage from '../../components/ListPage.astro';
+import { ANIMALS, AGES, TAG_LABELS } from '../../data/site';
+
+export function getStaticPaths() {
+  return [...ANIMALS, ...AGES].map((tag) => ({ params: { tag } }));
+}
+const { tag } = Astro.params;
+// 「犬」「猫」の一覧には、犬猫どちらにも当てはまる記事（both）も含める
+const match = (a: { data: { animal: string; ages: string[] } }) =>
+  (ANIMALS as readonly string[]).includes(tag)
+    ? a.data.animal === tag || (tag !== 'both' && a.data.animal === 'both')
+    : a.data.ages.includes(tag);
+const articles = (await getCollection('articles', match)).sort((a, b) => +b.data.publishDate - +a.data.publishDate);
+---
+<ListPage label="タグ" title={`${TAG_LABELS[tag]}の記事`} articles={articles} />

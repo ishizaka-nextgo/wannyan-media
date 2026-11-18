@@ -1,0 +1,10 @@
+---
+import { TAG_LABELS } from '../data/site';
+
+interface Props { animal: string; ages: string[]; }
+const { animal, ages } = Astro.props;
+---
+<ul class="tags" aria-label="タグ">
+  <li><a class={`tag tag--${animal}`} href={`/tag/${animal}/`}>{TAG_LABELS[animal]}</a></li>
+  {ages.map((a) => <li><a class="tag" href={`/tag/${a}/`}>{TAG_LABELS[a]}</a></li>)}
+</ul>

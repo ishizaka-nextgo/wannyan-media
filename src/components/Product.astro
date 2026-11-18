@@ -1,0 +1,46 @@
+---
+// 関連商品ブロック（テストでは仮の商品とリンク）。特定メーカーを否定する表現は書かない
+import { SITE } from '../data/site';
+
+interface Props { items: { name: string; desc: string }[]; title?: string; }
+const { items, title = 'スタッフのおすすめ（仮の商品です）' } = Astro.props;
+---
+<section class="products" aria-label="関連商品">
+  <p class="products-title">{title}</p>
+  <ul>
+    {items.map((p) => (
+      <li class="product">
+        <div class="product-img" aria-hidden="true">商品画像<br />（仮）</div>
+        <div class="product-body">
+          <p class="product-name">{p.name}</p>
+          <p class="product-desc">{p.desc}</p>
+          <div class="product-btns">
+            <a class="btn btn--primary" href={SITE.storesUrl}>店頭で相談する</a>
+            <a class="btn btn--ghost" href={SITE.shopUrl}>通販で見る</a>
+          </div>
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .products { background: var(--c-bg-soft); border-radius: var(--radius-l); padding: 24px 20px; margin: 40px 0; }
+  .products-title { font-family: var(--font-heading); font-weight: 700; text-align: center; margin: 0 0 16px; }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+  .product { background: #fff; border-radius: var(--radius-m); padding: 16px; display: grid; grid-template-columns: 88px 1fr; gap: 16px; align-items: start; }
+  .product-img {
+    aspect-ratio: 1; border-radius: var(--radius-s); background: repeating-linear-gradient(45deg, #fff7ec, #fff7ec 8px, #ffeed6 8px, #ffeed6 16px);
+    display: grid; place-items: center; text-align: center; font-size: 0.7rem; color: var(--c-text-sub); line-height: 1.4;
+  }
+  .product-name { font-weight: 700; margin: 0; line-height: 1.6; }
+  .product-desc { font-size: 0.9375rem; color: var(--c-text-sub); margin: 4px 0 12px; line-height: 1.7; }
+  .product-btns { display: flex; flex-wrap: wrap; gap: 10px; }
+  .product-btns .btn { min-height: 44px; padding: 8px 18px; font-size: 0.875rem; }
+  @media (max-width: 420px) {
+    .products { padding: 20px 12px; }
+    .product { grid-template-columns: 1fr; }
+    .product-img { aspect-ratio: 3 / 1; }
+    .product-btns .btn { flex: 1 1 100%; }
+  }
+</style>

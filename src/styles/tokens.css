@@ -1,0 +1,56 @@
+/*
+ * デザイントークン
+ * 出典：会社サイト https://www.wan-nyan-house.com の style.css / main_common.css（2026-11-18 取得）
+ * 「抽出」は会社サイトの値そのまま。「調整」は読みやすさ（文字と背景の差 4.5:1 以上）のために足した値。
+ */
+:root {
+  /* 色：抽出 */
+  --c-primary: #ffa326;        /* 主色オレンジ。ボタン背景・強調 */
+  --c-primary-shadow: #b57011; /* オレンジボタンの下影 */
+  --c-accent: #5ab31b;         /* 差し色グリーン。装飾に使う */
+  --c-accent-shadow: #479113;  /* グリーンボタンの下影 */
+  --c-bg: #ffffff;
+  --c-bg-soft: #fff3e3;        /* 薄いオレンジの面 */
+  --c-text: #1a1a1a;
+  --c-line: #dddddd;
+  --c-female: #eb6464;         /* 会社サイトのメスラベル → 猫タグに流用 */
+  --c-male: #6474eb;           /* 会社サイトのオスラベル → 犬タグに流用 */
+  --c-new: #ff9f00;
+
+  /* 色：調整（コントラスト確保） */
+  --c-primary-ink: #9a5c08;    /* 白背景に置くオレンジ文字（5.4:1） */
+  --c-accent-strong: #3b7a10;  /* 白文字を載せるグリーン（5.3:1） */
+  --c-accent-strong-shadow: #2a5a0a;
+  --c-text-sub: #5c5249;       /* 補足文字。暖かみのあるグレー */
+  --c-bg-warm: #fffaf3;        /* ページ地のごく薄いクリーム */
+  --c-accent-soft: #eef7e6;
+  --c-dog: #4a57c9;            /* --c-male を文字用に濃くした値 */
+  --c-cat: #c23f3f;            /* --c-female を文字用に濃くした値 */
+
+  /* 書体：本文は会社サイトと同じ Noto Sans JP。見出しは丸ゴシック（README参照） */
+  --font-body: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+  --font-heading: 'Zen Maru Gothic', 'Noto Sans JP', 'Hiragino Maru Gothic ProN', sans-serif;
+
+  /* 文字サイズ：スマホ優先。本文は 16px 以上 */
+  --fs-body: 1.0625rem;  /* 17px */
+  --fs-small: 0.875rem;
+  --fs-h1: clamp(1.5rem, 1.2rem + 1.6vw, 2.25rem);
+  --fs-h2: clamp(1.3rem, 1.15rem + 0.8vw, 1.6rem);
+  --fs-h3: 1.15rem;
+  --lh-body: 1.95;
+
+  /* 形：会社サイトの傾向（大きめの角丸、片側だけ大きく丸めたラベル、真下 5px の影） */
+  --radius-s: 10px;
+  --radius-m: 18px;
+  --radius-l: 30px;
+  --radius-pill: 999px;
+  --radius-label: 30px 15px 15px 15px;
+  --btn-shadow-y: 5px;
+  --shadow-card: 0 6px 20px rgba(154, 92, 8, 0.08);
+
+  /* 余白 */
+  --gutter: 20px;
+  --space-section: clamp(56px, 8vw, 96px);
+  --w-content: 720px;
+  --w-wide: 1120px;
+}

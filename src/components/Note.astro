@@ -1,0 +1,21 @@
+---
+// 注意書き・ポイントのボックス。type="point"（緑）か "caution"（オレンジ）
+interface Props { title?: string; type?: 'point' | 'caution'; }
+const { title, type = 'point' } = Astro.props;
+const label = title ?? (type === 'caution' ? '注意' : 'ポイント');
+---
+<aside class={`note note--${type}`}>
+  <p class="note-title">{label}</p>
+  <div class="note-body"><slot /></div>
+</aside>
+
+<style>
+  .note { border-radius: var(--radius-m); padding: 20px 22px; margin: 32px 0; }
+  .note--point { background: var(--c-accent-soft); border-left: 6px solid var(--c-accent); }
+  .note--caution { background: var(--c-bg-soft); border-left: 6px solid var(--c-primary); }
+  .note-title { font-family: var(--font-heading); font-weight: 700; margin: 0 0 6px; }
+  .note--point .note-title { color: var(--c-accent-strong); }
+  .note--caution .note-title { color: var(--c-primary-ink); }
+  .note-body :global(> :first-child) { margin-top: 0; }
+  .note-body :global(> :last-child) { margin-bottom: 0; }
+</style>
