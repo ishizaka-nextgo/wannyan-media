@@ -1,29 +1,40 @@
 ---
 // B案：トップの全画面スライダー。写真をゆっくりズームしながら切り替え、縦書きのコピーを重ねる
-import { Image } from 'astro:assets';
+// 写真の差し替え：img＝PC用の横長、imgSp＝スマホ用の縦長（なければ img を切り抜いて使う）
+// sec＝その写真を見せる秒数。コピーは約1.3秒で出そろうので、読み終える時間を足して決める
+import { getImage } from 'astro:assets';
 import puppy from '../assets/photos/slide-puppy-sleep.jpg';
 import catSun from '../assets/photos/slide-cat-sunbath.jpg';
 import seniorLab from '../assets/photos/slide-senior-lab.jpg';
 import catWindow from '../assets/photos/slide-cat-window.jpg';
 import dogCurtain from '../assets/photos/slide-dog-curtain.jpg';
 
-const slides = [
-  { img: puppy, alt: 'ベッドで眠るゴールデンレトリバーの子犬', copy: ['おやすみの顔を、', 'あしたも見られるように。'], label: '毎日のごはん', href: '/category/food/', pos: '60% 50%' },
-  { img: catSun, alt: '日だまりの床に座ってこちらを見る茶白の猫', copy: ['ひだまりの特等席は、', 'いつも、あの子のもの。'], label: '暮らし・住まい', href: '/category/living/', pos: '82% 50%' },
-  { img: seniorLab, alt: 'ラグの上に伏せるシニアのラブラドール', copy: ['ゆっくり歩く日も、', 'となりにいたい。'], label: 'シニアケア', href: '/category/senior/', pos: '72% 50%' },
-  { img: catWindow, alt: '窓辺の日なたで体をのばす猫', copy: ['なにもしない午後が、', 'いちばんのごちそう。'], label: 'シニア猫の食事', href: '/articles/senior-cat-appetite/', pos: '45% 50%' },
-  { img: dogCurtain, alt: 'カーテンに映る垂れ耳の犬の影', copy: ['あの子のことなら、', 'なんでも知りたい。'], label: 'このメディアについて', href: '/about/', pos: '55% 50%' },
+type Slide = { img: ImageMetadata; imgSp?: ImageMetadata; alt: string; copy: string[]; label: string; href: string; pos: string; sec: number };
+const slides: Slide[] = [
+  { img: puppy, alt: 'ベッドで眠るゴールデンレトリバーの子犬', copy: ['おやすみの顔を、', 'あしたも見られるように。'], label: '毎日のごはん', href: '/category/food/', pos: '60% 50%', sec: 5 },
+  { img: catSun, alt: '日だまりの床に座ってこちらを見る茶白の猫', copy: ['ひだまりの特等席は、', 'いつも、あの子のもの。'], label: '暮らし・住まい', href: '/category/living/', pos: '82% 50%', sec: 4 },
+  { img: seniorLab, alt: 'ラグの上に伏せるシニアのラブラドール', copy: ['ゆっくり歩く日も、', 'となりにいたい。'], label: 'シニアケア', href: '/category/senior/', pos: '72% 50%', sec: 3.5 },
+  { img: catWindow, alt: '窓辺の日なたで体をのばす猫', copy: ['なにもしない午後が、', 'いちばんのごちそう。'], label: 'シニア猫の食事', href: '/articles/senior-cat-appetite/', pos: '45% 50%', sec: 3.5 },
+  { img: dogCurtain, alt: 'カーテンに映る垂れ耳の犬の影', copy: ['あの子のことなら、', 'なんでも知りたい。'], label: 'このメディアについて', href: '/about/', pos: '55% 50%', sec: 3.5 },
 ];
+const pics = await Promise.all(slides.map(async (s) => ({
+  pc: await getImage({ src: s.img, widths: [1080, 1600, 2400], format: 'webp' }),
+  sp: s.imgSp ? await getImage({ src: s.imgSp, widths: [640, 1080], format: 'webp' }) : null,
+})));
 ---
 <section class="slider" aria-roledescription="カルーセル" aria-label="ペットのくらし手帖">
   <div class="slides">
     {slides.map((s, i) => (
-      <div class={`slide${i === 0 ? ' is-active' : ''}`} role="group" aria-roledescription="スライド" aria-label={`${i + 1} / ${slides.length}`} aria-hidden={i === 0 ? undefined : 'true'}>
-        <Image
-          src={s.img} alt={s.alt} widths={[640, 1080, 1600, 2000]} sizes="100vw"
-          loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'}
-          style={`object-position:${s.pos}`}
-        />
+      <div class={`slide${i === 0 ? ' is-active' : ''}`} data-sec={s.sec} role="group" aria-roledescription="スライド" aria-label={`${i + 1} / ${slides.length}`} aria-hidden={i === 0 ? undefined : 'true'}>
+        <picture>
+          {pics[i].sp && <source media="(max-width: 767px)" srcset={pics[i].sp!.srcSet.attribute} sizes="100vw" />}
+          <img
+            src={pics[i].pc.src} srcset={pics[i].pc.srcSet.attribute} sizes="100vw" alt={s.alt}
+            width={s.img.width} height={s.img.height} decoding="async"
+            loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'}
+            style={pics[i].sp ? undefined : `object-position:${s.pos}`}
+          />
+        </picture>
         <p class="copy">{s.copy.map((l) => <span>{l}</span>)}</p>
         <a class="slide-link" href={s.href} tabindex={i === 0 ? undefined : -1}>{s.label}<span aria-hidden="true">→</span></a>
       </div>
@@ -38,7 +49,7 @@ const slides = [
   <div class="controls">
     <ol class="dots">
       {slides.map((_, i) => (
-        <li><button type="button" class="dot" aria-label={`${i + 1}枚目を表示`} aria-current={i === 0 ? 'true' : undefined} data-i={i}><span></span></button></li>
+        <li><button type="button" class="dot" aria-label={`${i + 1}枚目を表示`} aria-current={i === 0 ? 'true' : undefined} data-i={i} style={`--sec:${slides[i].sec}s`}><span></span></button></li>
       ))}
     </ol>
     <button type="button" class="pause" aria-label="スライドを一時停止">
@@ -49,7 +60,7 @@ const slides = [
 </section>
 
 <script>
-  // 6秒ごとに次の写真へ。一時停止ボタン・ドット・左右スワイプで操作でき、動きを減らす設定の人には自動再生しない
+  // 写真ごとに決めた秒数で次へ。一時停止ボタン・ドット・左右スワイプで操作でき、動きを減らす設定の人には自動再生しない
   const root = document.querySelector<HTMLElement>('.slider');
   if (root) {
     const slides = [...root.querySelectorAll<HTMLElement>('.slide')];
@@ -74,8 +85,9 @@ const slides = [
       });
       dots.forEach((d, i) => (i === cur ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
     };
-    const start = () => { stop(); if (playing) timer = window.setInterval(() => show(cur + 1), 6000); };
-    const stop = () => window.clearInterval(timer);
+    // 写真ごとに data-sec 秒見せてから次へ
+    const start = () => { stop(); if (playing) timer = window.setTimeout(() => { show(cur + 1); start(); }, Number(slides[cur].dataset.sec) * 1000); };
+    const stop = () => window.clearTimeout(timer);
     const setPlaying = (p: boolean) => {
       playing = p;
       root.classList.toggle('is-paused', !p);
@@ -104,11 +116,12 @@ const slides = [
 <style>
   .slider { position: relative; height: calc(100svh - 28px); min-height: 560px; max-height: 1000px; overflow: hidden; background: #2a2622; color: #fff; }
   .slides, .slide { position: absolute; inset: 0; }
-  .slide { opacity: 0; transition: opacity 1.6s ease; }
+  .slide { opacity: 0; transition: opacity 1.2s ease; }
   .slide.is-active { opacity: 1; z-index: 1; }
   .slider:not(.ready) .slide:not(.is-active) { display: none; }
-  .slide :global(img) { width: 100%; height: 100%; object-fit: cover; transform: scale(1.0); }
-  .slide.is-active :global(img) { animation: zoom 9s ease-out forwards; }
+  .slide picture { display: contents; }
+  .slide img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.0); }
+  .slide.is-active img { animation: zoom 7s ease-out forwards; }
   @keyframes zoom { from { transform: scale(1.0); } to { transform: scale(1.08); } }
   /* 文字を読みやすくする薄い影 */
   .slide::after {
@@ -124,8 +137,9 @@ const slides = [
     font-size: clamp(1.25rem, 0.9rem + 1.8vw, 2.1rem); line-height: 1.9; letter-spacing: 0.18em;
     text-shadow: 0 0 2px rgba(0,0,0,.5), 0 1px 14px rgba(0,0,0,.55);
   }
-  .copy span { display: block; opacity: 0; transform: translateY(-12px); transition: opacity 1.2s ease .5s, transform 1.2s ease .5s; }
-  .copy span + span { margin-top: 3em; transition-delay: .9s; }
+  /* コピーは約1.3秒で出そろう（短い表示時間でも読めるように） */
+  .copy span { display: block; opacity: 0; transform: translateY(-12px); transition: opacity .8s ease .2s, transform .8s ease .2s; }
+  .copy span + span { margin-top: 3em; transition-delay: .5s; }
   .slide.is-active .copy span { opacity: 1; transform: none; }
 
   .slide-link {
@@ -149,7 +163,7 @@ const slides = [
   .dots { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; flex: 1; }
   .dot { width: 44px; height: 44px; padding: 0; background: none; border: 0; cursor: pointer; display: grid; align-items: center; }
   .dot span { display: block; height: 2px; background: rgba(255,255,255,.45); position: relative; overflow: hidden; }
-  .dot[aria-current] span::after { content: ''; position: absolute; inset: 0; background: #fff; transform-origin: left; animation: progress 6s linear forwards; }
+  .dot[aria-current] span::after { content: ''; position: absolute; inset: 0; background: #fff; transform-origin: left; animation: progress var(--sec, 5s) linear forwards; }
   .is-paused .dot[aria-current] span::after { animation: none; transform: none; }
   @keyframes progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
   .pause { width: 44px; height: 44px; border: 1px solid rgba(255,255,255,.7); border-radius: 50%; background: rgba(0,0,0,.2); cursor: pointer; display: grid; place-items: center; }
@@ -176,6 +190,6 @@ const slides = [
   }
   @media (prefers-reduced-motion: reduce) {
     .slide, .copy span { transition: none; }
-    .slide.is-active :global(img), .scroll::after, .dot[aria-current] span::after { animation: none; }
+    .slide.is-active img, .scroll::after, .dot[aria-current] span::after { animation: none; }
   }
 </style>
