@@ -7,6 +7,7 @@ import HeroSlider from '../components/HeroSlider.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import Mascots from '../components/Mascots.astro';
 import LineCta from '../components/LineCta.astro';
+import AmbassadorVideos from '../components/AmbassadorVideos.astro';
 import { SITE, CATEGORIES } from '../data/site';
 import imgFood from '../assets/photos/worry-food.jpg';
 import imgSenior from '../assets/photos/worry-senior.jpg';
@@ -58,6 +59,8 @@ const others = CATEGORIES.filter((c) => !c.priority);
   </section>
 
   <Mascots />
+
+  <AmbassadorVideos />
 
   <section class="section news">
     <div class="container">
