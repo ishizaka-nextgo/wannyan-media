@@ -5,8 +5,11 @@ import { SITE, CATEGORIES } from '../data/site';
 interface Props {
   title?: string;
   description?: string;
+  image?: string; // シェア用の画像（なければ共通の画像）
 }
-const { title, description = SITE.tagline } = Astro.props;
+const { title, description = SITE.tagline, image = '/og-default.jpg' } = Astro.props;
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(image, Astro.site).href;
 const pageTitle = title ? `${title} | ${SITE.name}` : SITE.name;
 const path = Astro.url.pathname;
 const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Shippori+Mincho:wght@500;600;700&display=swap';
@@ -20,6 +23,17 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;70
     <meta name="robots" content="noindex, nofollow" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    <!-- LINE・SNSでURLを送ったときのカード表示 -->
+    <meta property="og:type" content={title ? 'article' : 'website'} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- JSが動くときだけ「ふわっと表示」の初期状態にする（動かなければ普通に表示） -->
+    <script is:inline>document.documentElement.classList.add('js');</script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -55,6 +69,28 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;70
     </header>
 
     <main id="main"><slot /></main>
+    <script>
+      // スクロールで画面に入った要素を、ふわっと表示する。動きを減らす設定の人には使わない
+      const targets = document.querySelectorAll<HTMLElement>(
+        '[data-reveal], .sec-title, .intro-lead, .intro-text, .worries > li, .card, .cat-main > li, .prose > h2, .store-body'
+      );
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+        targets.forEach((el) => el.classList.add('is-in'));
+      } else {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            e.target.classList.add('is-in');
+            io.unobserve(e.target);
+          });
+        }, { rootMargin: '0px 0px -8% 0px' });
+        targets.forEach((el, i) => {
+          el.classList.add('reveal');
+          el.style.setProperty('--delay', `${(i % 4) * 0.08}s`);
+          io.observe(el);
+        });
+      }
+    </script>
 
     <footer class="site-footer">
       <div class="container footer-inner">

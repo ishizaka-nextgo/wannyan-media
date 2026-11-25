@@ -7,6 +7,7 @@ export const SITE = {
   // 仮リンク：本番で正式URLに差し替える
   storesUrl: '#stores-tbd',
   shopUrl: '#shop-tbd',
+  lineUrl: '#line-tbd',
 };
 
 export const CATEGORIES = [

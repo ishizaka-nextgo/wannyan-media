@@ -1,0 +1,57 @@
+---
+// 店舗の看板犬・看板猫の紹介。販売中の子ではなく、お店で暮らす子として見せる（販売広告にしない）
+// テスト用の仮データ。本番では各店舗のスタッフの写真とプロフィールに差し替える
+import { Image } from 'astro:assets';
+import { SITE } from '../data/site';
+import shiba from '../assets/photos/mascot-shiba.jpg';
+import poodle from '../assets/photos/mascot-poodle.jpg';
+import mike from '../assets/photos/mascot-mike.jpg';
+import chashiro from '../assets/photos/mascot-chashiro.jpg';
+
+const mascots = [
+  { img: chashiro, kind: '看板猫', name: 'こむぎ', profile: '茶白・7歳', store: '〇〇店（仮）', text: 'レジ横の特等席でお出迎え。シニア猫のごはん相談なら、こむぎの担当スタッフへ。', pos: '50% 30%' },
+  { img: poodle, kind: '看板犬', name: 'モカ', profile: 'トイプードル・1歳', store: '△△店（仮）', text: 'トリミングの日はご機嫌。お手入れグッズ選びのモデル犬です。', pos: '50% 45%' },
+  { img: mike, kind: '看板猫', name: 'みけこ', profile: '三毛・4歳', store: '□□店（仮）', text: '新しいベッドの寝心地チェック係。暮らしのグッズはおまかせ。', pos: '50% 30%' },
+  { img: shiba, kind: '看板犬', name: 'こたろう', profile: '柴犬・3歳', store: '◇◇店（仮）', text: 'ひなたぼっこが日課。お留守番グッズの相談も、こたろうのお店で。', pos: '62% 72%' },
+];
+---
+<section class="section mascots" aria-labelledby="mascots-title">
+  <div class="container">
+    <h2 id="mascots-title" class="sec-title"><small>OUR FRIENDS</small>お店の看板犬・看板猫</h2>
+    <p class="lead">全国のワンニャンハウスで、スタッフといっしょに暮らしている子たちです。<br class="pc" />お近くのお店で、会いに来てください。</p>
+    <ul class="list">
+      {mascots.map((m) => (
+        <li class="item" data-reveal>
+          <div class="photo">
+            <Image src={m.img} alt={`${m.kind}の${m.name}（${m.profile}）`} widths={[400, 640]} sizes="(min-width: 960px) 260px, 50vw" style={`object-position:${m.pos}`} />
+            <span class="kind">{m.kind}</span>
+          </div>
+          <p class="name">{m.name}<span>{m.profile}</span></p>
+          <p class="store">{m.store}</p>
+          <p class="text">{m.text}</p>
+        </li>
+      ))}
+    </ul>
+    <p class="note">※看板犬・看板猫は販売しておりません。写真とプロフィールはテスト用の仮のものです。</p>
+    <p class="more"><a class="btn btn--ghost" href={SITE.storesUrl}>お店をさがす（仮リンク）</a></p>
+  </div>
+</section>
+
+<style>
+  .mascots { background: #fff; }
+  .lead { text-align: center; color: var(--c-text-sub); margin: -12px 0 40px; line-height: 2; }
+  .pc { display: none; }
+  @media (min-width: 640px) { .pc { display: inline; } }
+  .list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 16px; }
+  @media (min-width: 960px) { .list { grid-template-columns: repeat(4, 1fr); gap: 32px 24px; } }
+  .photo { position: relative; overflow: hidden; }
+  .photo :global(img) { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; transition: transform 1.2s ease; }
+  .item:hover .photo :global(img) { transform: scale(1.05); }
+  .kind { position: absolute; left: 0; top: 0; background: var(--c-primary); color: var(--c-text); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; padding: 4px 10px; }
+  .name { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; letter-spacing: 0.1em; margin: 12px 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+  .name span { font-family: var(--font-body); font-size: 0.75rem; font-weight: 400; color: var(--c-text-sub); letter-spacing: 0.05em; }
+  .store { font-size: 0.8125rem; color: var(--c-primary-ink); font-weight: 700; margin: 2px 0 6px; }
+  .text { font-size: 0.875rem; line-height: 1.8; color: var(--c-text-sub); margin: 0; }
+  .note { font-size: 0.75rem; color: var(--c-text-sub); text-align: center; margin: 32px 0 20px; }
+  .more { text-align: center; margin: 0; }
+</style>

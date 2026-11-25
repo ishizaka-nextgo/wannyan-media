@@ -1,0 +1,38 @@
+---
+// LINE公式アカウントへの誘導（仮）。本番で正式な友だち追加URLとクーポン内容に差し替える
+import { SITE } from '../data/site';
+interface Props { compact?: boolean; }
+const { compact = false } = Astro.props;
+---
+<aside class:list={['line', { compact }]} aria-label="LINE公式アカウントのご案内" data-reveal>
+  <div class="inner">
+    <p class="badge">今だけ</p>
+    <div class="body">
+      <p class="title">LINEで友だち追加すると、<br />店頭で使えるクーポンをお届け。</p>
+      <p class="text">新しい記事や、季節のおすすめもお知らせします。（クーポンの内容はテスト用の仮のものです）</p>
+    </div>
+    <a class="btn-line" href={SITE.lineUrl}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5s5.8-3.4 7.9-5.9C21.3 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z"/></svg>
+      友だち追加する<span class="visually-hidden">（仮リンク）</span>
+    </a>
+  </div>
+</aside>
+
+<style>
+  .line { background: #eaf7ee; border-top: 3px solid #06c755; margin: 0; }
+  .inner { max-width: var(--w-wide); margin: 0 auto; padding: 36px var(--gutter); display: grid; gap: 16px; align-items: center; justify-items: start; }
+  @media (min-width: 768px) { .inner { grid-template-columns: auto 1fr auto; gap: 28px; padding-block: 40px; } }
+  .badge { margin: 0; background: var(--c-text); color: #fff; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.15em; padding: 6px 12px; }
+  .title { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.15rem, 1rem + 0.8vw, 1.45rem); line-height: 1.7; letter-spacing: 0.06em; margin: 0 0 6px; }
+  .text { margin: 0; font-size: 0.875rem; color: var(--c-text-sub); line-height: 1.8; }
+  /* LINEの緑は白文字だと読みにくいため、濃い文字を乗せる */
+  .btn-line {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 28px;
+    background: #06c755; color: #062b14; font-weight: 700; letter-spacing: 0.08em; text-decoration: none; border-radius: 2px; white-space: nowrap;
+  }
+  .btn-line:hover { background: #05b34c; }
+  .btn-line svg { width: 22px; height: 22px; }
+  .compact { margin: 48px 0; border: 1px solid #bfe8cc; border-top: 3px solid #06c755; }
+  .compact .inner { grid-template-columns: 1fr; padding: 24px 20px; }
+  @media (max-width: 480px) { .btn-line { width: 100%; justify-content: center; } }
+</style>

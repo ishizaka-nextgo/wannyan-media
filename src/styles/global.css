@@ -63,3 +63,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; line-height
 .grid { display: grid; gap: 24px; grid-template-columns: 1fr; }
 @media (min-width: 640px) { .grid--3 { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 960px) { .grid--3 { grid-template-columns: repeat(3, 1fr); } }
+
+/* スクロールでふわっと表示（Base.astro のスクリプトで .reveal と .is-in を付ける） */
+.js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s ease var(--delay, 0s), transform .9s ease var(--delay, 0s); }
+.js .reveal.is-in { opacity: 1; transform: none; }

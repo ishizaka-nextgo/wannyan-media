@@ -23,3 +23,12 @@
 | slide-senior-lab.jpg | ラグに伏せるシニアのラブラドール | https://unsplash.com/photos/FnMh0z-IeBY |
 | slide-cat-window.jpg | 窓辺で日なたぼっこをする猫 | https://unsplash.com/photos/TsD3-ap897E |
 | slide-dog-curtain.jpg | カーテンに映る犬の影 | https://unsplash.com/photos/NeNf5-byTSk |
+
+## 看板犬・看板猫の紹介枠で追加した写真
+
+| ファイル（src/assets/photos/） | 内容 | 出典URL |
+|---|---|---|
+| mascot-shiba.jpg | 木の床に伏せる柴犬 | https://unsplash.com/photos/TVlWaOcIMU0 |
+| mascot-poodle.jpg | ソファで休むトイプードルの子犬 | https://unsplash.com/photos/JoGJ3WP7EaA |
+| mascot-mike.jpg | クッションに座る三毛猫 | https://unsplash.com/photos/mdRJhxlsuGM |
+| mascot-chashiro.jpg | 茶白の猫 | https://unsplash.com/photos/G7kUPmzi80E |

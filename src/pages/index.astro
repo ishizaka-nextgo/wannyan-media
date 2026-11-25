@@ -5,6 +5,8 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import HeroSlider from '../components/HeroSlider.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import Mascots from '../components/Mascots.astro';
+import LineCta from '../components/LineCta.astro';
 import { SITE, CATEGORIES } from '../data/site';
 import imgFood from '../assets/photos/dog-eating-bowl.jpg';
 import imgSenior from '../assets/photos/cat-window.jpg';
@@ -55,12 +57,16 @@ const others = CATEGORIES.filter((c) => !c.priority);
     </div>
   </section>
 
+  <Mascots />
+
   <section class="section news">
     <div class="container">
       <h2 class="sec-title"><small>NEW</small>新着記事</h2>
       <div class="grid grid--3">{articles.slice(0, 6).map((a) => <ArticleCard article={a} />)}</div>
     </div>
   </section>
+
+  <LineCta />
 
   <section class="section">
     <div class="container">
