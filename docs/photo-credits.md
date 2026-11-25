@@ -32,3 +32,14 @@
 | mascot-poodle.jpg | ソファで休むトイプードルの子犬 | https://unsplash.com/photos/JoGJ3WP7EaA |
 | mascot-mike.jpg | クッションに座る三毛猫 | https://unsplash.com/photos/mdRJhxlsuGM |
 | mascot-chashiro.jpg | 茶白の猫 | https://unsplash.com/photos/G7kUPmzi80E |
+
+## 記事の写真（Canvaで制作側が作成・2026-11-25 差し替え）
+
+| ファイル（src/assets/photos/） | 記事 | 内容 |
+|---|---|---|
+| article-dog-not-eating.jpg | 犬がごはんを食べないとき（11/17） | おやつを見つめるビーグル |
+| article-senior-cat-appetite.jpg | シニア猫の食欲（11/14） | 器の向こうからのぞくキジトラの猫 |
+| article-cat-food-by-age.jpg | 年齢別キャットフード（11/12） | キッチンのベンガル猫 |
+| article-home-alone-room.jpg | 留守番の部屋づくり（11/10） | ドアのすき間からのぞく茶トラの猫 |
+
+元データ：Canva で作成（2400×1600 の PNG を JPG に変換）。使った素材は Canva のライセンスの範囲で使用。
