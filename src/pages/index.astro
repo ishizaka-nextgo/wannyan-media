@@ -16,7 +16,7 @@ import catFood from '../assets/photos/category-food.jpg';
 import catSenior from '../assets/photos/category-senior.jpg';
 import catLiving from '../assets/photos/category-living.jpg';
 import storeImg from '../assets/photos/store-band.webp';
-// 図鑑の入口。Canvaの画像（1200×1500）ができたら差し替える
+// 図鑑の入口。Canvaの画像（1500×1000）ができたら差し替える
 import breedDog from '../assets/photos/article-dog-not-eating.jpg';
 import breedCat from '../assets/photos/article-cat-food-by-age.jpg';
 
@@ -28,8 +28,8 @@ const worries = [
   { no: '03', label: '暮らし', title: 'お留守番が、心配。', text: '室温、いたずら防止、水の置き場所。安心の部屋づくり。', href: '/articles/home-alone-room/', img: imgLiving },
 ];
 const breedEntries = [
-  { href: '/breeds/#dog', en: 'DOG BREEDS', name: '犬種図鑑', img: breedDog },
-  { href: '/breeds/#cat', en: 'CAT BREEDS', name: '猫種図鑑', img: breedCat },
+  { href: '/breeds/#dog', name: '犬種図鑑', lead: '性格やお手入れ、お迎え前に知っておきたいこと。', img: breedDog },
+  { href: '/breeds/#cat', name: '猫種図鑑', lead: '性格や暮らし方、向いているご家庭の目安。', img: breedCat },
 ];
 const catImg: Record<string, ImageMetadata> = { food: catFood, senior: catSenior, living: catLiving };
 const priority = CATEGORIES.filter((c) => c.priority);
@@ -109,7 +109,7 @@ const others = CATEGORIES.filter((c) => !c.priority);
           <li>
             <a class="breed-entry" href={b.href}>
               <Image src={b.img} alt="" widths={[400, 800, 1200]} sizes="(min-width: 960px) 540px, 50vw" />
-              <span class="be-text"><span class="be-en">{b.en}</span><span class="be-name">{b.name}</span></span>
+              <span class="be-text"><span class="be-name">{b.name}</span><span class="be-lead">{b.lead}</span></span>
             </a>
           </li>
         ))}
@@ -167,15 +167,14 @@ const others = CATEGORIES.filter((c) => !c.priority);
 
   .breeds-wrap { background: #fff; }
   .breeds-lead { text-align: center; color: var(--c-text-sub); margin: -12px 0 32px; line-height: 2; }
-  .breeds { list-style: none; padding: 0; margin: 0 auto; max-width: 1100px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .breeds { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   @media (min-width: 768px) { .breeds { gap: 24px; } }
-  .breed-entry { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; color: #fff; text-decoration: none; }
-  .breed-entry :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s ease; }
-  .breed-entry:hover :global(img) { transform: scale(1.06); }
-  .breed-entry::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.65) 100%); }
-  .be-text { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; padding: 16px; text-align: center; }
-  .be-en { display: block; font-size: 0.6875rem; letter-spacing: 0.25em; }
-  .be-name { display: block; font-family: var(--font-display); font-weight: 600; font-size: clamp(1.15rem, 0.9rem + 1.4vw, 1.75rem); letter-spacing: 0.15em; text-shadow: 0 1px 6px rgba(0,0,0,.4); }
+  .breed-entry { display: block; color: var(--c-text); text-decoration: none; }
+  .breed-entry :global(img) { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; transition: opacity .3s; }
+  .breed-entry:hover :global(img) { opacity: .85; }
+  .be-text { display: block; padding: 12px 2px 0; }
+  .be-name { display: block; font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; letter-spacing: 0.1em; }
+  .be-lead { display: block; font-size: 0.875rem; color: var(--c-text-sub); line-height: 1.8; margin-top: 4px; }
 
   /* 画像は切らずに全部見せ、文字は下に置く。下のフッターと間を空けずにつなげる */
   .store { margin-top: var(--space-section); margin-bottom: calc(var(--space-section) * -1); background: var(--c-bg-soft); }
