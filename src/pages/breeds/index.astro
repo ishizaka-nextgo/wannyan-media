@@ -6,8 +6,8 @@ import StoreCta from '../../components/StoreCta.astro';
 
 const all = (await getCollection('breeds')).sort((a, b) => a.data.name.localeCompare(b.data.name, 'ja'));
 const groups = [
-  { title: '犬種', items: all.filter((b) => b.data.animal === 'dog') },
-  { title: '猫種', items: all.filter((b) => b.data.animal === 'cat') },
+  { id: 'dog', title: '犬種', items: all.filter((b) => b.data.animal === 'dog') },
+  { id: 'cat', title: '猫種', items: all.filter((b) => b.data.animal === 'cat') },
 ];
 ---
 <Base title="犬種・猫種図鑑" description="ペットショップのスタッフが、犬種・猫種ごとの性格やお手入れ、お迎え前に知っておきたいことをまとめた図鑑です。">
@@ -20,7 +20,7 @@ const groups = [
     </div>
   </section>
   {groups.map((g) => (
-    <section class="section">
+    <section class="section" id={g.id}>
       <div class="container">
         <h2 class="sec-title">{g.title}</h2>
         <ul class="breeds">{g.items.map((b) => <li><BreedCard breed={b} /></li>)}</ul>
@@ -42,5 +42,6 @@ const groups = [
   .lead { margin: 0; color: var(--c-text-sub); }
   .breeds { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 16px; }
   @media (min-width: 768px) { .breeds { grid-template-columns: repeat(4, 1fr); gap: 32px 20px; } }
+  section[id] { scroll-margin-top: 110px; }
   .note { font-size: 0.75rem; color: var(--c-text-sub); text-align: center; }
 </style>
