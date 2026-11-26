@@ -8,6 +8,7 @@ import ArticleCard from '../components/ArticleCard.astro';
 import Mascots from '../components/Mascots.astro';
 import LineCta from '../components/LineCta.astro';
 import AmbassadorVideos from '../components/AmbassadorVideos.astro';
+import BreedCard from '../components/BreedCard.astro';
 import { SITE, CATEGORIES } from '../data/site';
 import imgFood from '../assets/photos/worry-food.jpg';
 import imgSenior from '../assets/photos/worry-senior.jpg';
@@ -17,6 +18,7 @@ import catSenior from '../assets/photos/category-senior.jpg';
 import catLiving from '../assets/photos/category-living.jpg';
 import storeImg from '../assets/photos/store-band.webp';
 
+const breeds = (await getCollection('breeds')).slice(0, 4);
 const articles = (await getCollection('articles')).sort((a, b) => +b.data.publishDate - +a.data.publishDate);
 
 const worries = [
@@ -93,6 +95,15 @@ const others = CATEGORIES.filter((c) => !c.priority);
     </div>
   </section>
 
+  <section class="section breeds-wrap">
+    <div class="container">
+      <h2 class="sec-title"><small>BREEDS</small>犬種・猫種図鑑</h2>
+      <p class="breeds-lead">性格やお手入れ、向いている暮らし。<br class="pc" />お迎えの前に知っておきたいことを、スタッフがまとめました。</p>
+      <ul class="breeds">{breeds.map((b) => <li><BreedCard breed={b} /></li>)}</ul>
+      <p class="breeds-more"><a class="btn btn--ghost" href="/breeds/">図鑑をすべて見る</a></p>
+    </div>
+  </section>
+
   <section class="store">
     <Image src={storeImg} alt="店内のフェンスに並んで、うれしそうに上を見上げる犬と猫たち" widths={[640, 1080, 1584]} sizes="100vw" class="store-img" />
     <div class="store-body">
@@ -140,6 +151,12 @@ const others = CATEGORIES.filter((c) => !c.priority);
   @media (min-width: 768px) { .cat-sub { grid-template-columns: repeat(2, 1fr); column-gap: 32px; } }
   .cat-sub a { display: flex; justify-content: space-between; padding: 16px 4px; border-bottom: 1px solid var(--c-line); color: var(--c-text); text-decoration: none; font-family: var(--font-display); font-weight: 600; letter-spacing: 0.08em; }
   .cat-sub a:hover { color: var(--c-primary-ink); }
+
+  .breeds-wrap { background: #fff; }
+  .breeds-lead { text-align: center; color: var(--c-text-sub); margin: -12px 0 32px; line-height: 2; }
+  .breeds { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 16px; }
+  @media (min-width: 768px) { .breeds { grid-template-columns: repeat(4, 1fr); gap: 32px 20px; } }
+  .breeds-more { text-align: center; margin: 32px 0 0; }
 
   /* 画像は切らずに全部見せ、文字は下に置く。下のフッターと間を空けずにつなげる */
   .store { margin-top: var(--space-section); margin-bottom: calc(var(--space-section) * -1); background: var(--c-bg-soft); }

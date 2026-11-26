@@ -1,0 +1,46 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import BreedCard from '../../components/BreedCard.astro';
+import StoreCta from '../../components/StoreCta.astro';
+
+const all = (await getCollection('breeds')).sort((a, b) => a.data.name.localeCompare(b.data.name, 'ja'));
+const groups = [
+  { title: '犬種', items: all.filter((b) => b.data.animal === 'dog') },
+  { title: '猫種', items: all.filter((b) => b.data.animal === 'cat') },
+];
+---
+<Base title="犬種・猫種図鑑" description="ペットショップのスタッフが、犬種・猫種ごとの性格やお手入れ、お迎え前に知っておきたいことをまとめた図鑑です。">
+  <section class="list-head">
+    <div class="container">
+      <nav aria-label="パンくずリスト" class="bc"><a href="/">トップ</a> › 犬種・猫種図鑑</nav>
+      <p class="label">BREEDS</p>
+      <h1>犬種・猫種図鑑</h1>
+      <p class="lead">性格、お手入れ、向いている暮らし。お迎えの前に知っておきたいことを、スタッフがまとめました。</p>
+    </div>
+  </section>
+  {groups.map((g) => (
+    <section class="section">
+      <div class="container">
+        <h2 class="sec-title">{g.title}</h2>
+        <ul class="breeds">{g.items.map((b) => <li><BreedCard breed={b} /></li>)}</ul>
+      </div>
+    </section>
+  ))}
+  <div class="container narrow">
+    <p class="note">※図鑑の内容はテスト用の見本です。本番では、獣医師の監修のうえで掲載します。</p>
+    <StoreCta />
+  </div>
+</Base>
+
+<style>
+  .list-head { background: var(--c-bg-soft); padding-block: 20px 36px; }
+  .bc { font-size: 0.8125rem; color: var(--c-text-sub); margin-bottom: 16px; }
+  .bc a { color: var(--c-text-sub); }
+  .label { margin: 0; font-size: 0.8125rem; font-weight: 700; color: var(--c-primary-ink); letter-spacing: 0.2em; }
+  h1 { font-size: var(--fs-h1); margin: 4px 0 8px; }
+  .lead { margin: 0; color: var(--c-text-sub); }
+  .breeds { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 16px; }
+  @media (min-width: 768px) { .breeds { grid-template-columns: repeat(4, 1fr); gap: 32px 20px; } }
+  .note { font-size: 0.75rem; color: var(--c-text-sub); text-align: center; }
+</style>

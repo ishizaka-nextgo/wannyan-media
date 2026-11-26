@@ -1,0 +1,26 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { breed: CollectionEntry<'breeds'>; }
+const { breed } = Astro.props;
+const d = breed.data;
+---
+<a class="breed" href={`/breeds/${breed.id}/`}>
+  <Image src={d.photo} alt="" widths={[400, 640]} sizes="(min-width: 960px) 260px, 50vw" />
+  <span class="b-body">
+    <span class="b-kind">{d.animal === 'dog' ? '犬種' : '猫種'}・{d.size}</span>
+    <span class="b-name">{d.name}</span>
+    <span class="b-en">{d.nameEn}</span>
+  </span>
+</a>
+
+<style>
+  .breed { display: block; color: var(--c-text); text-decoration: none; }
+  .breed :global(img) { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-m); transition: opacity .3s; }
+  .breed:hover :global(img) { opacity: .85; }
+  .b-body { display: block; padding: 10px 2px 0; }
+  .b-kind { display: block; font-size: 0.75rem; color: var(--c-primary-ink); font-weight: 700; }
+  .b-name { display: block; font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; letter-spacing: 0.08em; }
+  .b-en { display: block; font-size: 0.75rem; color: var(--c-text-sub); letter-spacing: 0.05em; }
+</style>
