@@ -6,17 +6,17 @@
 // 掲載は、投稿者から掲載の許可をもらった動画だけにする
 import { getImage } from 'astro:assets';
 import { SITE } from '../data/site';
-import p1 from '../assets/photos/worry-food.jpg';
-import p2 from '../assets/photos/worry-living.jpg';
-import p3 from '../assets/photos/worry-senior.jpg';
-import p4 from '../assets/photos/category-living.jpg';
+import p1 from '../assets/photos/amb-1.jpg';
+import p2 from '../assets/photos/amb-2.jpg';
+import p3 from '../assets/photos/amb-3.jpg';
+import p4 from '../assets/photos/amb-4.jpg';
 
 type Post = { account: string; pet: string; age: string; spot: string; poster: ImageMetadata; video?: string; color: string };
 const posts: Post[] = [
-  { account: 'choco_mama', pet: 'チョコ', age: '1歳', spot: '近所の公園', poster: p1, color: '#8a5a2b' },
-  { account: 'sora.days', pet: 'ソラ', age: '5歳', spot: 'リビングのクッション', poster: p2, color: '#4f6278' },
-  { account: 'mugi_neko', pet: 'むぎ', age: '12歳', spot: 'ひだまりの床', poster: p3, color: '#9a5c08' },
-  { account: 'ash_and_me', pet: 'アッシュ', age: '3歳', spot: 'キャットタワーのてっぺん', poster: p4, color: '#5c5249' },
+  { account: 'mofu_poodle', pet: 'モフ', age: '2歳', spot: '雪のドッグラン', poster: p1, video: '/videos/amb-1.mp4', color: '#8a5a2b' },
+  { account: 'nana_neko', pet: 'ナナ', age: '生後4か月', spot: 'リビングの窓辺', poster: p2, video: '/videos/amb-2.mp4', color: '#9a5c08' },
+  { account: 'bon_lulu', pet: 'ボンとルル', age: '3歳・2歳', spot: 'リビングのソファ', poster: p3, video: '/videos/amb-3.mp4', color: '#4f6278' },
+  { account: 'kuri_pome', pet: 'くり', age: '1歳', spot: 'おうちの玄関前', poster: p4, video: '/videos/amb-4.mp4', color: '#5c5249' },
 ];
 const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, width: 540, height: 960, fit: 'cover', format: 'webp' })));
 ---
@@ -30,25 +30,25 @@ const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, wid
     {posts.map((p, i) => (
       <li class="item">
         <figure class="card">
-          {p.video
-            ? <video class="media" src={p.video} poster={posters[i].src} muted loop playsinline preload="none" aria-label={`${p.pet}（${p.age}）の動画`}></video>
-            : <img class="media" src={posters[i].src} width="540" height="960" alt={`${p.pet}（${p.age}）`} loading="lazy" decoding="async" />}
+          <div class="frame">
+            {p.video
+              ? <video class="media" src={p.video} poster={posters[i].src} muted loop playsinline preload="none" aria-label={`${p.pet}（${p.age}）の動画`}></video>
+              : <img class="media" src={posters[i].src} width="540" height="960" alt={`${p.pet}（${p.age}）`} loading="lazy" decoding="async" />}
+            {p.video
+              ? <button type="button" class="play" aria-label={`${p.pet}の動画を再生`}><span aria-hidden="true"></span></button>
+              : <span class="badge">動画（仮）</span>}
+          </div>
           <figcaption>
             <span class="acct">
               <span class="avatar" style={`background:${p.color}`} aria-hidden="true">{p.account.slice(0, 1).toUpperCase()}</span>
               <span class="acct-name">@{p.account}</span>
             </span>
-            <span class="info">
-              <span class="pet">{p.pet}<span class="age">{p.age}</span></span>
-              <span class="spot">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
-                <span class="visually-hidden">撮影スポット：</span>{p.spot}
-              </span>
+            <span class="pet">{p.pet}<span class="age">{p.age}</span></span>
+            <span class="spot">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+              <span class="visually-hidden">撮影スポット：</span>{p.spot}
             </span>
           </figcaption>
-          {p.video
-            ? <button type="button" class="play" aria-label={`${p.pet}の動画を再生`}><span aria-hidden="true"></span></button>
-            : <span class="badge">動画（仮）</span>}
         </figure>
       </li>
     ))}
@@ -92,22 +92,21 @@ const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, wid
     .reel { max-width: var(--w-wide); margin: 0 auto; grid-auto-flow: row; grid-template-columns: repeat(4, 1fr); overflow: visible; gap: 20px; }
   }
 
-  .card { position: relative; margin: 0; aspect-ratio: 9 / 16; border-radius: 14px; overflow: hidden; background: #2a2622; color: #fff; }
+  /* 動画には文字を重ねない（投稿動画に入っている文字とぶつかるため）。情報は動画の下に出す */
+  .card { margin: 0; }
+  .frame { position: relative; aspect-ratio: 9 / 16; border-radius: 14px; overflow: hidden; background: #2a2622; }
   .media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .card::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 60%, rgba(0,0,0,.65) 100%); }
-  figcaption { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 12px; pointer-events: none; }
+  figcaption { display: grid; gap: 4px; padding: 12px 2px 0; }
 
-  .acct { display: flex; align-items: center; gap: 8px; }
+  .acct { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .avatar {
-    width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none;
-    font-weight: 700; font-size: 0.875rem; color: #fff; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--c-primary);
+    width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none;
+    font-weight: 700; font-size: 0.75rem; color: #fff; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--c-primary);
   }
-  .acct-name { font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.02em; text-shadow: 0 1px 4px rgba(0,0,0,.5); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-  .info { display: grid; gap: 2px; }
-  .pet { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; letter-spacing: 0.08em; text-shadow: 0 1px 6px rgba(0,0,0,.5); }
-  .age { font-family: var(--font-body); font-size: 0.8125rem; font-weight: 700; margin-left: 8px; }
-  .spot { display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
+  .acct-name { font-size: 0.8125rem; font-weight: 700; color: var(--c-text-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pet { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; letter-spacing: 0.08em; margin-top: 4px; }
+  .age { font-family: var(--font-body); font-size: 0.8125rem; font-weight: 700; margin-left: 8px; color: var(--c-text-sub); }
+  .spot { display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; color: var(--c-text-sub); }
   .spot svg { width: 14px; height: 14px; flex: none; color: var(--c-primary); }
 
   .play { position: absolute; z-index: 2; inset: 0; background: none; border: 0; cursor: pointer; display: grid; place-items: center; }
