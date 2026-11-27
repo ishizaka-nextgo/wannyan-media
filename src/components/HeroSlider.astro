@@ -1,7 +1,7 @@
 ---
 // B案：トップの全画面スライダー。写真をゆっくりズームしながら切り替え、縦書きのコピーを重ねる
 // 写真の差し替え：img＝PC用の横長、imgSp＝スマホ用の縦長（なければ img を切り抜いて使う）
-// sec＝その写真を見せる秒数。コピーは約1.3秒で出そろうので、読み終える時間を足して決める
+// sec＝その写真を見せる秒数。テンポよく切り替えて目を引くため、前ほど短くし0.5秒ずつのばす。コピーは約0.6秒で出そろう
 import { getImage } from 'astro:assets';
 import puppy from '../assets/photos/slide-puppy-sleep.jpg';
 import catSun from '../assets/photos/slide-cat-sunbath.jpg';
@@ -11,11 +11,11 @@ import dogCurtain from '../assets/photos/slide-dog-curtain.jpg';
 
 type Slide = { img: ImageMetadata; imgSp?: ImageMetadata; alt: string; copy: string[]; label: string; href: string; pos: string; sec: number };
 const slides: Slide[] = [
-  { img: puppy, alt: 'ベッドで眠るゴールデンレトリバーの子犬', copy: ['おやすみの顔を、', 'あしたも見られるように。'], label: '毎日のごはん', href: '/category/food/', pos: '60% 50%', sec: 5 },
-  { img: catSun, alt: '日だまりの床に座ってこちらを見る茶白の猫', copy: ['ひだまりの特等席は、', 'いつも、あの子のもの。'], label: '暮らし・住まい', href: '/category/living/', pos: '82% 50%', sec: 4 },
-  { img: seniorLab, alt: 'ラグの上に伏せるシニアのラブラドール', copy: ['ゆっくり歩く日も、', 'となりにいたい。'], label: 'シニアケア', href: '/category/senior/', pos: '72% 50%', sec: 3.5 },
-  { img: catWindow, alt: '窓辺の日なたで体をのばす猫', copy: ['なにもしない午後が、', 'いちばんのごちそう。'], label: 'シニア猫の食事', href: '/articles/senior-cat-appetite/', pos: '45% 50%', sec: 3.5 },
-  { img: dogCurtain, alt: 'カーテンに映る垂れ耳の犬の影', copy: ['あの子のことなら、', 'なんでも知りたい。'], label: 'このメディアについて', href: '/about/', pos: '55% 50%', sec: 3.5 },
+  { img: puppy, alt: 'ベッドで眠るゴールデンレトリバーの子犬', copy: ['おやすみの顔を、', 'あしたも見られるように。'], label: '毎日のごはん', href: '/category/food/', pos: '60% 50%', sec: 1 },
+  { img: catSun, alt: '日だまりの床に座ってこちらを見る茶白の猫', copy: ['ひだまりの特等席は、', 'いつも、あの子のもの。'], label: '暮らし・住まい', href: '/category/living/', pos: '82% 50%', sec: 1.5 },
+  { img: seniorLab, alt: 'ラグの上に伏せるシニアのラブラドール', copy: ['ゆっくり歩く日も、', 'となりにいたい。'], label: 'シニアケア', href: '/category/senior/', pos: '72% 50%', sec: 2 },
+  { img: catWindow, alt: '窓辺の日なたで体をのばす猫', copy: ['なにもしない午後が、', 'いちばんのごちそう。'], label: 'シニア猫の食事', href: '/articles/senior-cat-appetite/', pos: '45% 50%', sec: 2.5 },
+  { img: dogCurtain, alt: 'カーテンに映る垂れ耳の犬の影', copy: ['あの子のことなら、', 'なんでも知りたい。'], label: 'このメディアについて', href: '/about/', pos: '55% 50%', sec: 3 },
 ];
 const pics = await Promise.all(slides.map(async (s) => ({
   pc: await getImage({ src: s.img, widths: [1080, 1600, 2400], format: 'webp' }),
@@ -116,7 +116,7 @@ const pics = await Promise.all(slides.map(async (s) => ({
 <style>
   .slider { position: relative; height: calc(100svh - 28px); min-height: 560px; max-height: 1000px; overflow: hidden; background: #2a2622; color: #fff; }
   .slides, .slide { position: absolute; inset: 0; }
-  .slide { opacity: 0; transition: opacity 1.2s ease; }
+  .slide { opacity: 0; transition: opacity .5s ease; }
   .slide.is-active { opacity: 1; z-index: 1; }
   .slider:not(.ready) .slide:not(.is-active) { display: none; }
   .slide picture { display: contents; }
@@ -138,8 +138,8 @@ const pics = await Promise.all(slides.map(async (s) => ({
     text-shadow: 0 0 2px rgba(0,0,0,.5), 0 1px 14px rgba(0,0,0,.55);
   }
   /* コピーは約1.3秒で出そろう（短い表示時間でも読めるように） */
-  .copy span { display: block; opacity: 0; transform: translateY(-12px); transition: opacity .8s ease .2s, transform .8s ease .2s; }
-  .copy span + span { margin-top: 3em; transition-delay: .5s; }
+  .copy span { display: block; opacity: 0; transform: translateY(-12px); transition: opacity .4s ease .05s, transform .4s ease .05s; }
+  .copy span + span { margin-top: 3em; transition-delay: .2s; }
   .slide.is-active .copy span { opacity: 1; transform: none; }
 
   .slide-link {
