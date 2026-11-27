@@ -122,11 +122,34 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;70
       }
     </script>
 
+    <p class="tbd-toast" role="status" aria-live="polite"></p>
+    <script>
+      // 仮リンク（#○○-tbd）を押したら、本番で何につながるかを小さく知らせる。テストサイトの間だけの仕組み
+      const TBD: Record<string, string> = {
+        stores: '店舗一覧ページ', line: 'LINE公式アカウントの友だち追加', shop: 'オンラインショップ',
+      };
+      const toast = document.querySelector<HTMLElement>('.tbd-toast')!;
+      let hideTimer = 0;
+      document.addEventListener('click', (e) => {
+        const a = (e.target as Element).closest<HTMLAnchorElement>('a[href$="-tbd"]');
+        if (!a) return;
+        e.preventDefault();
+        const key = a.getAttribute('href')!.slice(1, -4);
+        toast.textContent = `本番では「${TBD[key] ?? '正式なページ'}」につながります`;
+        toast.classList.add('is-show');
+        clearTimeout(hideTimer);
+        hideTimer = window.setTimeout(() => toast.classList.remove('is-show'), 2600);
+      });
+    </script>
+
     <footer class="site-footer">
       <div class="container footer-inner">
         <p class="footer-logo">{SITE.name}<span>（仮称）</span></p>
         <p class="footer-lead">{SITE.tagline}</p>
         <ul class="footer-links">
+          <li><a href="/articles/welcome-guide/">はじめてのお迎えガイド</a></li>
+          <li><a href="/breeds/">犬種・猫種図鑑</a></li>
+          <li><a href="/events/">イベント・キャンペーン</a></li>
           <li><a href="/about/">このメディアについて</a></li>
           <li><a href="/contact/">お問い合わせ</a></li>
           <li><a href="/privacy/">プライバシーポリシー</a></li>
@@ -139,6 +162,12 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;70
 </html>
 
 <style>
+  .tbd-toast {
+    position: fixed; z-index: 50; left: 50%; bottom: 24px; transform: translate(-50%, 16px); margin: 0;
+    width: max-content; max-width: calc(100vw - 32px); padding: 12px 20px; background: rgba(40, 32, 26, .92); color: #fff;
+    font-size: 0.875rem; line-height: 1.6; text-align: center; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
+  }
+  .tbd-toast.is-show { opacity: 1; transform: translate(-50%, 0); }
   .test-band {
     background: var(--c-text); color: #fff; text-align: center;
     font-size: 0.8125rem; font-weight: 700; padding: 4px 8px; letter-spacing: 0.08em;
