@@ -27,19 +27,23 @@ const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, wid
   </div>
 
   <div class="container nav">
+    <button type="button" class="arrow toggle" aria-pressed="false" aria-label="自動で流れるのを止める"><span aria-hidden="true">Ⅱ</span></button>
     <button type="button" class="arrow" data-dir="-1" aria-label="前の動画へ"><span aria-hidden="true">‹</span></button>
     <button type="button" class="arrow" data-dir="1" aria-label="次の動画へ"><span aria-hidden="true">›</span></button>
   </div>
   <ul class="reel" aria-label="アンバサダーの動画">
-    {posts.map((p, i) => (
-      <li class="item">
+    {[...posts, ...posts].map((p, n) => {
+      const i = n % posts.length;
+      const clone = n >= posts.length;
+      return (
+      <li class:list={['item', { clone }]} aria-hidden={clone ? 'true' : undefined}>
         <figure class="card">
           <div class="frame">
             {p.video
               ? <video class="media" src={p.video} poster={posters[i].src} muted loop playsinline preload="none" aria-label={`${p.pet}（${p.age}）の動画`}></video>
               : <img class="media" src={posters[i].src} width="540" height="960" alt={`${p.pet}（${p.age}）`} loading="lazy" decoding="async" />}
             {p.video
-              ? <button type="button" class="play" aria-label={`${p.pet}の動画を再生`}><span aria-hidden="true"></span></button>
+              ? <button type="button" class="play" aria-label={`${p.pet}の動画を再生`} tabindex={clone ? -1 : undefined}><span aria-hidden="true"></span></button>
               : <span class="badge">動画（仮）</span>}
           </div>
           <figcaption>
@@ -55,7 +59,8 @@ const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, wid
           </figcaption>
         </figure>
       </li>
-    ))}
+      );
+    })}
   </ul>
 
   <div class="container join">
@@ -76,18 +81,66 @@ const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, wid
     v.addEventListener('play', () => { btn.classList.add('is-playing'); btn.setAttribute('aria-label', label.replace('再生', '一時停止')); });
     v.addEventListener('pause', () => { btn.classList.remove('is-playing'); btn.setAttribute('aria-label', label); });
   });
-  // 矢印でカード1枚分ずつ横に送る。端まで来たら矢印を押せなくする
+  // 動画が並んでいると伝わるよう、右から左へゆっくり流す。列は2周分あり、1周分進んだら先頭に戻してつなげる
+  // 指やマウスでさわっている間・再生中・画面の外にあるときは止める。動きを減らす設定の人には流さない
   const reel = document.querySelector<HTMLElement>('.amb .reel')!;
-  const arrows = [...document.querySelectorAll<HTMLButtonElement>('.amb .arrow')];
+  const firstClone = reel.querySelector<HTMLElement>('.clone');
+  const loopWidth = () => (firstClone ? firstClone.offsetLeft - (reel.firstElementChild as HTMLElement).offsetLeft : 0);
   const step = () => (reel.querySelector('.item') as HTMLElement).offsetWidth + parseFloat(getComputedStyle(reel).columnGap);
-  const update = () => {
-    arrows[0].disabled = reel.scrollLeft <= 2;
-    arrows[1].disabled = reel.scrollLeft + reel.clientWidth >= reel.scrollWidth - 2;
+  const wrap = () => { const w = loopWidth(); if (w && reel.scrollLeft >= w) reel.scrollLeft -= w; };
+  const SPEED = 30; // 1秒あたりのpx
+  let pos = 0, last = 0, held = false, inView = false, resumeAt = 0, stopped = false;
+  const playing = () => vids.some((v) => !v.paused);
+  const tick = (t: number) => {
+    const dt = last ? Math.min(t - last, 100) : 0;
+    last = t;
+    if (!stopped && !held && inView && !playing() && t >= resumeAt) {
+      reel.classList.add('is-auto');
+      pos += (SPEED * dt) / 1000;
+      const w = loopWidth();
+      if (w && pos >= w) pos -= w;
+      reel.scrollLeft = pos;
+    } else {
+      reel.classList.remove('is-auto');
+      pos = reel.scrollLeft;
+    }
+    requestAnimationFrame(tick);
   };
-  arrows.forEach((a) => a.addEventListener('click', () => reel.scrollBy({ left: Number(a.dataset.dir) * step(), behavior: 'smooth' })));
-  reel.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update);
-  update();
+  // さわったら止め、離して3秒たったら再開する
+  const hold = () => { held = true; reel.classList.remove('is-auto'); };
+  const release = () => { held = false; resumeAt = performance.now() + 3000; wrap(); pos = reel.scrollLeft; };
+  reel.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && hold());
+  reel.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && release());
+  reel.addEventListener('touchstart', hold, { passive: true });
+  reel.addEventListener('touchend', release, { passive: true });
+  reel.addEventListener('focusin', hold);
+  reel.addEventListener('focusout', release);
+  reel.addEventListener('scroll', () => { if (!reel.classList.contains('is-auto')) { wrap(); } }, { passive: true });
+
+  // 矢印で1本ずつ送る（押したあとは少し待ってから流れを再開）
+  document.querySelectorAll<HTMLButtonElement>('.amb .arrow[data-dir]').forEach((a) => a.addEventListener('click', () => {
+    resumeAt = performance.now() + 4000;
+    reel.classList.remove('is-auto');
+    const dir = Number(a.dataset.dir);
+    if (dir < 0 && reel.scrollLeft < step()) reel.scrollLeft += loopWidth();
+    reel.scrollBy({ left: dir * step(), behavior: 'smooth' });
+  }));
+
+  // 止める・流すの切り替え（ずっと動くものには、止める手段を用意する）
+  const toggle = document.querySelector<HTMLButtonElement>('.amb .toggle')!;
+  toggle.addEventListener('click', () => {
+    stopped = !stopped;
+    toggle.setAttribute('aria-pressed', String(stopped));
+    toggle.setAttribute('aria-label', stopped ? '自動で流す' : '自動で流れるのを止める');
+    toggle.firstElementChild!.textContent = stopped ? '▶' : 'Ⅱ';
+  });
+
+  const autoOk = !matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window;
+  toggle.hidden = !autoOk;
+  if (autoOk) {
+    new IntersectionObserver((es) => { inView = es[0].isIntersecting; }).observe(reel);
+    requestAnimationFrame(tick);
+  }
 
   if (vids.length && 'IntersectionObserver' in window) {
     const io = new IntersectionObserver((es) => es.forEach((e) => !e.isIntersecting && (e.target as HTMLVideoElement).pause()));
@@ -104,10 +157,9 @@ const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, wid
     --edge: max(var(--gutter), calc((100vw - var(--w-wide)) / 2 + var(--gutter)));
     list-style: none; margin: 0; padding: 0 var(--edge) 8px; scroll-padding-inline: var(--edge);
     display: grid; grid-auto-flow: column; grid-auto-columns: min(64vw, 260px); gap: 14px;
-    overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
+    overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain;
   }
   .reel::-webkit-scrollbar { display: none; }
-  .item { scroll-snap-align: start; }
   @media (min-width: 960px) { .reel { grid-auto-columns: 280px; gap: 20px; } }
 
   .nav { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 14px; }
@@ -116,7 +168,8 @@ const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, wid
     font-size: 1.5rem; line-height: 1; display: grid; place-items: center; cursor: pointer; transition: background .2s, color .2s, opacity .2s;
   }
   .arrow:hover:not(:disabled) { background: var(--c-text); color: #fff; }
-  .arrow:disabled { opacity: .3; cursor: default; }
+  .toggle { font-size: 0.8125rem; margin-right: auto; }
+  .toggle[hidden] { display: none; }
 
   /* 動画には文字を重ねない（投稿動画に入っている文字とぶつかるため）。情報は動画の下に出す */
   .card { margin: 0; }
