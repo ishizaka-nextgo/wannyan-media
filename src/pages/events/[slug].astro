@@ -1,0 +1,66 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import EventCard from '../../components/EventCard.astro';
+import { SITE } from '../../data/site';
+
+export async function getStaticPaths() {
+  const all = await getCollection('events');
+  return all.map((event) => ({ params: { slug: event.id }, props: { event, all } }));
+}
+const { event, all } = Astro.props;
+const d = event.data;
+const { Content } = await render(event);
+const ogImg = await getImage({ src: d.image, width: 1200, format: 'jpg' });
+const others = all.filter((e) => e.id !== event.id);
+---
+<Base title={d.title} description={d.lead} image={ogImg.src}>
+  <article>
+    <div class="container narrow">
+      <nav aria-label="パンくずリスト" class="bc"><a href="/">トップ</a> › <a href="/events/">イベント・キャンペーン</a> › {d.kind}</nav>
+      <p class:list={['kind', { 'is-event': d.kind === 'イベント' }]}>{d.kind}</p>
+      <h1>{d.title}</h1>
+      <Image src={d.image} alt={d.imageAlt} widths={[640, 1080]} sizes="(min-width: 760px) 720px, 100vw" class="photo" loading="eager" />
+      <p class="lead">{d.lead}</p>
+      <dl class="spec">
+        <div><dt>期間・日時</dt><dd>{d.period}</dd></div>
+        <div><dt>会場</dt><dd>{d.place}</dd></div>
+      </dl>
+      <div class="prose"><Content /></div>
+      <p class="cta"><a class="btn-line" href={SITE.lineUrl}>{d.cta}<span class="visually-hidden">（仮リンク）</span></a></p>
+    </div>
+    {others.length > 0 && (
+      <section class="section">
+        <div class="container narrow">
+          <h2 class="sec-title">ほかのお知らせ</h2>
+          <ul class="events">{others.map((e) => <li><EventCard event={e} /></li>)}</ul>
+        </div>
+      </section>
+    )}
+  </article>
+</Base>
+
+<style>
+  .bc { font-size: 0.8125rem; color: var(--c-text-sub); padding-top: 16px; }
+  .bc a { color: var(--c-text-sub); }
+  .kind { display: inline-block; margin: 16px 0 0; background: var(--c-primary); color: #3a2200; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; padding: 3px 10px; }
+  .kind.is-event { background: var(--c-accent-strong); color: #fff; }
+  h1 { font-size: var(--fs-h1); line-height: 1.5; margin: 10px 0 20px; }
+  .narrow :global(.photo) { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; }
+  .lead { margin: 20px 0; line-height: 2; font-weight: 700; }
+  .spec { margin: 0 0 8px; border-top: 1px solid var(--c-line); }
+  .spec div { display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--c-line); font-size: 0.9375rem; }
+  .spec dt { width: 6.5em; flex: none; color: var(--c-text-sub); }
+  .spec dd { margin: 0; }
+  .prose :global(h2) { font-size: var(--fs-h2); margin: 48px 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--c-line); position: relative; }
+  .prose :global(h2)::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 56px; height: 2px; background: var(--c-primary); }
+  .prose :global(p), .prose :global(li) { line-height: 2; }
+  .prose :global(table) { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+  .prose :global(th), .prose :global(td) { border: 1px solid var(--c-line); padding: 10px 12px; text-align: left; }
+  .prose :global(th) { background: var(--c-bg-soft); }
+  .cta { text-align: center; margin: 40px 0; }
+  /* LINEの緑は白文字だと読みにくいため、濃い文字を乗せる */
+  .btn-line { display: inline-flex; align-items: center; justify-content: center; min-height: 56px; padding: 12px 40px; background: #06c755; color: #062b14; font-weight: 700; text-decoration: none; border-radius: 2px; }
+  .events { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+</style>

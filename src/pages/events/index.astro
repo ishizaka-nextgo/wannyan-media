@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import EventCard from '../../components/EventCard.astro';
+import LineCta from '../../components/LineCta.astro';
+
+const events = (await getCollection('events')).sort((a, b) => +b.data.publishDate - +a.data.publishDate);
+---
+<Base title="イベント・キャンペーン" description="ワンニャンハウスのイベントやキャンペーンのお知らせです。店頭でのプレゼントや、体験会のご案内をお届けします。">
+  <section class="list-head">
+    <div class="container">
+      <nav aria-label="パンくずリスト" class="bc"><a href="/">トップ</a> › イベント・キャンペーン</nav>
+      <p class="label">EVENT &amp; CAMPAIGN</p>
+      <h1>イベント・キャンペーン</h1>
+      <p class="lead">お店でのプレゼントや、体験会のお知らせです。最新情報はLINEでもお届けします。</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <h2 class="visually-hidden">お知らせ一覧</h2>
+      <ul class="events">{events.map((e) => <li><EventCard event={e} /></li>)}</ul>
+    </div>
+  </section>
+  <LineCta />
+</Base>
+
+<style>
+  .list-head { background: var(--c-bg-soft); padding-block: 20px 36px; }
+  .bc { font-size: 0.8125rem; color: var(--c-text-sub); margin-bottom: 16px; }
+  .bc a { color: var(--c-text-sub); }
+  .label { margin: 0; font-size: 0.8125rem; font-weight: 700; color: var(--c-primary-ink); letter-spacing: 0.2em; }
+  h1 { font-size: var(--fs-h1); margin: 4px 0 8px; }
+  .lead { margin: 0; color: var(--c-text-sub); }
+  .events { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+  @media (min-width: 960px) { .events { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+</style>

@@ -8,6 +8,7 @@ import ArticleCard from '../components/ArticleCard.astro';
 import Mascots from '../components/Mascots.astro';
 import LineCta from '../components/LineCta.astro';
 import AmbassadorVideos from '../components/AmbassadorVideos.astro';
+import EventCard from '../components/EventCard.astro';
 import { SITE, CATEGORIES } from '../data/site';
 import imgFood from '../assets/photos/worry-food.jpg';
 import imgSenior from '../assets/photos/worry-senior.jpg';
@@ -19,7 +20,9 @@ import storeImg from '../assets/photos/store-band.webp';
 // 図鑑の入口（Canvaで作成）
 import breedDog from '../assets/photos/breed-entry-dog.jpg';
 import breedCat from '../assets/photos/breed-entry-cat.jpg';
+import guideImg from '../assets/photos/hero-dog-cat.jpg';
 
+const events = (await getCollection('events')).sort((a, b) => +b.data.publishDate - +a.data.publishDate).slice(0, 4);
 const articles = (await getCollection('articles')).sort((a, b) => +b.data.publishDate - +a.data.publishDate);
 
 const worries = [
@@ -65,16 +68,25 @@ const others = CATEGORIES.filter((c) => !c.priority);
     </div>
   </section>
 
-  <Mascots />
-
-  <AmbassadorVideos />
-
   <section class="section news">
     <div class="container">
       <h2 class="sec-title"><small>NEW</small>新着記事</h2>
       <div class="grid grid--3">{articles.slice(0, 6).map((a) => <ArticleCard article={a} />)}</div>
     </div>
   </section>
+
+  <section class="section events-wrap">
+    <div class="container">
+      <h2 class="sec-title"><small>EVENT &amp; CAMPAIGN</small>イベント・キャンペーン</h2>
+      <ul class="events">{events.map((e) => <li><EventCard event={e} /></li>)}</ul>
+      <p class="more"><a class="btn btn--ghost" href="/events/">お知らせをすべて見る</a></p>
+    </div>
+  </section>
+
+  <Mascots />
+
+  <AmbassadorVideos />
+
 
   <LineCta />
 
@@ -114,6 +126,14 @@ const others = CATEGORIES.filter((c) => !c.priority);
           </li>
         ))}
       </ul>
+      <a class="guide" href="/articles/welcome-guide/">
+        <Image src={guideImg} alt="" widths={[480, 800]} sizes="(min-width: 768px) 400px, 100vw" />
+        <span class="guide-body">
+          <span class="guide-label">はじめての方へ</span>
+          <span class="guide-title">はじめてのお迎えガイド</span>
+          <span class="guide-text">準備するもの、お迎えの日の流れ、最初の1か月にすること。<span aria-hidden="true">→</span></span>
+        </span>
+      </a>
     </div>
   </section>
 
@@ -128,6 +148,8 @@ const others = CATEGORIES.filter((c) => !c.priority);
       </div>
     </div>
   </section>
+
+  <div class="line-foot"><LineCta /></div>
 </Base>
 
 <style>
@@ -165,6 +187,21 @@ const others = CATEGORIES.filter((c) => !c.priority);
   .cat-sub a { display: flex; justify-content: space-between; padding: 16px 4px; border-bottom: 1px solid var(--c-line); color: var(--c-text); text-decoration: none; font-family: var(--font-display); font-weight: 600; letter-spacing: 0.08em; }
   .cat-sub a:hover { color: var(--c-primary-ink); }
 
+  .events-wrap { background: var(--c-bg-soft); }
+  .events { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+  @media (min-width: 960px) { .events { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+  .more { text-align: center; margin: 32px 0 0; }
+
+  .guide { display: grid; margin-top: 24px; background: var(--c-bg-warm); color: var(--c-text); text-decoration: none; border: 1px solid var(--c-line); }
+  @media (min-width: 768px) { .guide { grid-template-columns: 400px 1fr; align-items: center; } }
+  .guide :global(img) { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+  .guide-body { display: grid; gap: 6px; padding: 20px; }
+  @media (min-width: 768px) { .guide-body { padding: 24px 36px; } }
+  .guide-label { font-size: 0.75rem; font-weight: 700; color: var(--c-primary-ink); letter-spacing: 0.15em; }
+  .guide-title { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.25rem, 1.05rem + 1vw, 1.6rem); letter-spacing: 0.1em; }
+  .guide-text { font-size: 0.875rem; color: var(--c-text-sub); line-height: 1.8; }
+  .guide:hover .guide-title { color: var(--c-primary-ink); }
+
   .breeds-wrap { background: #fff; }
   .breeds-lead { text-align: center; color: var(--c-text-sub); margin: -12px 0 32px; line-height: 2; }
   .breeds { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
@@ -176,8 +213,9 @@ const others = CATEGORIES.filter((c) => !c.priority);
   .be-name { display: block; font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; letter-spacing: 0.1em; }
   .be-lead { display: block; font-size: 0.875rem; color: var(--c-text-sub); line-height: 1.8; margin-top: 4px; }
 
-  /* 画像は切らずに全部見せ、文字は下に置く。下のフッターと間を空けずにつなげる */
-  .store { margin-top: var(--space-section); margin-bottom: calc(var(--space-section) * -1); background: var(--c-bg-soft); }
+  /* 画像は切らずに全部見せ、文字は下に置く。その下のLINEはフッターと間を空けずにつなげる */
+  .store { margin-top: var(--space-section); background: var(--c-bg-soft); }
+  .line-foot { margin-bottom: calc(var(--space-section) * -1); }
   .store :global(.store-img) { display: block; width: 100%; height: auto; }
   .store-body { max-width: 720px; margin: 0 auto; padding: 40px var(--gutter) 56px; text-align: center; }
   .store-title { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.35rem, 1.1rem + 1vw, 1.75rem); line-height: 1.8; letter-spacing: 0.1em; margin: 0 0 12px; }

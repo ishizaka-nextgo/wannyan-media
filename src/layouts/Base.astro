@@ -55,7 +55,7 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;70
         </a>
         <nav class="header-links" aria-label="サイト情報">
           <a href="/about/">このメディアについて</a>
-          <a href="/contact/" class="header-cta">お問い合わせ</a>
+          <button type="button" class="menu-btn" aria-haspopup="dialog" aria-controls="site-menu"><span class="menu-icon" aria-hidden="true"></span>メニュー</button>
         </nav>
       </div>
       <nav class="cat-nav" aria-label="カテゴリー">
@@ -68,6 +68,35 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;70
         </ul>
       </nav>
     </header>
+
+    <dialog id="site-menu" class="menu" aria-label="メニュー">
+      <div class="menu-head">
+        <p class="menu-title">MENU</p>
+        <button type="button" class="menu-close" aria-label="メニューを閉じる"><span aria-hidden="true">×</span></button>
+      </div>
+      <nav aria-label="メニュー">
+        <ul class="menu-main">
+          <li><a href="/articles/welcome-guide/">はじめてのお迎えガイド</a></li>
+          <li><a href="/breeds/">犬種・猫種図鑑</a></li>
+          <li><a href="/events/">イベント・キャンペーン</a></li>
+        </ul>
+        <p class="menu-label">カテゴリー</p>
+        <ul class="menu-cats">{CATEGORIES.map((c) => <li><a href={`/category/${c.slug}/`}>{c.name}</a></li>)}</ul>
+        <ul class="menu-sub">
+          <li><a href={SITE.storesUrl}>店舗一覧（仮リンク）</a></li>
+          <li><a href="/about/">このメディアについて</a></li>
+          <li><a href="/contact/">お問い合わせ</a></li>
+        </ul>
+        <a class="menu-line" href={SITE.lineUrl}>LINEで友だち追加（仮リンク）</a>
+      </nav>
+    </dialog>
+    <script>
+      const menu = document.getElementById('site-menu') as HTMLDialogElement;
+      document.querySelector('.menu-btn')!.addEventListener('click', () => menu.showModal());
+      menu.querySelector('.menu-close')!.addEventListener('click', () => menu.close());
+      // 背景（メニューの外）を押したら閉じる
+      menu.addEventListener('click', (e) => { if (e.target === menu) menu.close(); });
+    </script>
 
     <main id="main"><slot /></main>
     <script>
@@ -127,10 +156,36 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;70
   .logo-text small { display: block; font-family: var(--font-body); font-size: 0.65rem; color: var(--c-text-sub); letter-spacing: 0.2em; }
   .header-links { display: flex; align-items: center; gap: 24px; font-size: 0.875rem; }
   .header-links a { color: var(--c-text); text-decoration: none; letter-spacing: 0.08em; }
-  .header-links > a:not(.header-cta) { display: none; }
-  .header-cta { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid var(--c-text); font-size: 0.8125rem; white-space: nowrap; }
-  .header-cta:hover { background: var(--c-text); color: #fff; }
-  @media (min-width: 768px) { .header-links > a:not(.header-cta) { display: inline; } }
+  .header-links > a { display: none; }
+  @media (min-width: 768px) { .header-links > a { display: inline; } }
+  .menu-btn {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; background: none;
+    border: 1px solid var(--c-text); color: var(--c-text); font: inherit; font-size: 0.8125rem; letter-spacing: 0.08em; cursor: pointer; white-space: nowrap;
+  }
+  .menu-btn:hover { background: var(--c-text); color: #fff; }
+  .menu-icon, .menu-icon::before, .menu-icon::after { display: block; width: 16px; height: 1.5px; background: currentColor; position: relative; }
+  .menu-icon::before, .menu-icon::after { content: ''; position: absolute; left: 0; }
+  .menu-icon::before { top: -5px; }
+  .menu-icon::after { top: 5px; }
+
+  /* メニュー：右から出るパネル */
+  .menu { margin: 0 0 0 auto; height: 100dvh; max-height: none; width: min(88vw, 400px); border: 0; padding: 0 24px 40px; background: #fff; color: var(--c-text); overflow-y: auto; }
+  .menu::backdrop { background: rgba(30, 24, 18, .45); }
+  .menu[open] { animation: menu-in .25s ease-out; }
+  @keyframes menu-in { from { transform: translateX(30px); opacity: 0; } }
+  .menu-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--c-line); }
+  .menu-title { margin: 0; font-size: 0.8125rem; letter-spacing: 0.3em; color: var(--c-text-sub); }
+  .menu-close { width: 44px; height: 44px; border: 0; background: none; font-size: 1.75rem; line-height: 1; cursor: pointer; color: var(--c-text); }
+  .menu ul { list-style: none; padding: 0; margin: 0; }
+  .menu a { color: var(--c-text); text-decoration: none; }
+  .menu-main a { display: block; padding: 16px 0; border-bottom: 1px solid var(--c-line); font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; letter-spacing: 0.08em; }
+  .menu-label { margin: 24px 0 4px; font-size: 0.75rem; font-weight: 700; color: var(--c-primary-ink); letter-spacing: 0.15em; }
+  .menu-cats a { display: block; padding: 11px 0; border-bottom: 1px dashed var(--c-line); font-size: 0.9375rem; }
+  .menu-sub { margin-top: 24px !important; display: grid; gap: 4px; }
+  .menu-sub a { display: block; padding: 8px 0; font-size: 0.875rem; color: var(--c-text-sub); }
+  .menu a:hover { color: var(--c-primary-ink); }
+  .menu-line { display: flex; justify-content: center; align-items: center; min-height: 52px; margin-top: 24px; background: #06c755; color: #062b14 !important; font-weight: 700; border-radius: 2px; }
+  @media (prefers-reduced-motion: reduce) { .menu[open] { animation: none; } }
 
   /* カテゴリーは文字だけのメニュー。スマホは横にスクロール */
   .cat-nav ul {

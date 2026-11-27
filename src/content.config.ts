@@ -48,4 +48,22 @@ const breeds = defineCollection({
     }),
 });
 
-export const collections = { articles, breeds };
+// イベント・キャンペーン。期間や会場は文字で持つ（「12月中」「全店」など幅のある書き方ができるように）
+const events = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/events' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      kind: z.enum(['キャンペーン', 'イベント']),
+      period: z.string(),
+      place: z.string(),
+      image: image(),
+      imageAlt: z.string(),
+      lead: z.string(),
+      cta: z.string(),
+      publishDate: z.coerce.date(),
+      sample: z.boolean().default(true),
+    }),
+});
+
+export const collections = { articles, breeds, events };
