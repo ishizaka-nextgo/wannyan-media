@@ -26,6 +26,10 @@ const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, wid
     <p class="lead">アンバサダーのみなさんから届いた、毎日のワンシーン。</p>
   </div>
 
+  <div class="container nav">
+    <button type="button" class="arrow" data-dir="-1" aria-label="前の動画へ"><span aria-hidden="true">‹</span></button>
+    <button type="button" class="arrow" data-dir="1" aria-label="次の動画へ"><span aria-hidden="true">›</span></button>
+  </div>
   <ul class="reel" aria-label="アンバサダーの動画">
     {posts.map((p, i) => (
       <li class="item">
@@ -72,6 +76,19 @@ const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, wid
     v.addEventListener('play', () => { btn.classList.add('is-playing'); btn.setAttribute('aria-label', label.replace('再生', '一時停止')); });
     v.addEventListener('pause', () => { btn.classList.remove('is-playing'); btn.setAttribute('aria-label', label); });
   });
+  // 矢印でカード1枚分ずつ横に送る。端まで来たら矢印を押せなくする
+  const reel = document.querySelector<HTMLElement>('.amb .reel')!;
+  const arrows = [...document.querySelectorAll<HTMLButtonElement>('.amb .arrow')];
+  const step = () => (reel.querySelector('.item') as HTMLElement).offsetWidth + parseFloat(getComputedStyle(reel).columnGap);
+  const update = () => {
+    arrows[0].disabled = reel.scrollLeft <= 2;
+    arrows[1].disabled = reel.scrollLeft + reel.clientWidth >= reel.scrollWidth - 2;
+  };
+  arrows.forEach((a) => a.addEventListener('click', () => reel.scrollBy({ left: Number(a.dataset.dir) * step(), behavior: 'smooth' })));
+  reel.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+
   if (vids.length && 'IntersectionObserver' in window) {
     const io = new IntersectionObserver((es) => es.forEach((e) => !e.isIntersecting && (e.target as HTMLVideoElement).pause()));
     vids.forEach((v) => io.observe(v));
@@ -80,17 +97,26 @@ const posters = await Promise.all(posts.map((p) => getImage({ src: p.poster, wid
 
 <style>
   .amb { background: var(--c-bg-warm); overflow: hidden; }
-  .lead { text-align: center; color: var(--c-text-sub); margin: -12px 0 32px; }
+  .lead { text-align: center; color: var(--c-text-sub); margin: -12px 0 20px; }
 
-  /* スマホは横にスワイプ、PCは4列 */
+  /* 横スライダー：スマホはスワイプ、PCは矢印でも送れる。左端は本文の幅にそろえ、右は画面の端まで見せる */
   .reel {
-    list-style: none; margin: 0; padding: 0 var(--gutter) 8px; display: grid; grid-auto-flow: column;
-    grid-auto-columns: min(64vw, 260px); gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    --edge: max(var(--gutter), calc((100vw - var(--w-wide)) / 2 + var(--gutter)));
+    list-style: none; margin: 0; padding: 0 var(--edge) 8px; scroll-padding-inline: var(--edge);
+    display: grid; grid-auto-flow: column; grid-auto-columns: min(64vw, 260px); gap: 14px;
+    overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
   }
-  .item { scroll-snap-align: center; }
-  @media (min-width: 960px) {
-    .reel { max-width: var(--w-wide); margin: 0 auto; grid-auto-flow: row; grid-template-columns: repeat(4, 1fr); overflow: visible; gap: 20px; }
+  .reel::-webkit-scrollbar { display: none; }
+  .item { scroll-snap-align: start; }
+  @media (min-width: 960px) { .reel { grid-auto-columns: 280px; gap: 20px; } }
+
+  .nav { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 14px; }
+  .arrow {
+    width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--c-text); background: #fff; color: var(--c-text);
+    font-size: 1.5rem; line-height: 1; display: grid; place-items: center; cursor: pointer; transition: background .2s, color .2s, opacity .2s;
   }
+  .arrow:hover:not(:disabled) { background: var(--c-text); color: #fff; }
+  .arrow:disabled { opacity: .3; cursor: default; }
 
   /* 動画には文字を重ねない（投稿動画に入っている文字とぶつかるため）。情報は動画の下に出す */
   .card { margin: 0; }
