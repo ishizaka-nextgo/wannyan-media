@@ -18,11 +18,6 @@
 
 | ファイル（src/assets/photos/） | 内容 | 出典URL |
 |---|---|---|
-| slide-puppy-sleep.jpg | ベッドで眠るゴールデンレトリバーの子犬 | https://unsplash.com/photos/rzzJan1emGM |
-| slide-cat-sunbath.jpg | 日だまりに座る茶白の猫 | https://unsplash.com/photos/21NRDbMJF94 |
-| slide-senior-lab.jpg | ラグに伏せるシニアのラブラドール | https://unsplash.com/photos/FnMh0z-IeBY |
-| slide-cat-window.jpg | 窓辺で日なたぼっこをする猫 | https://unsplash.com/photos/TsD3-ap897E |
-| slide-dog-curtain.jpg | カーテンに映る犬の影 | https://unsplash.com/photos/NeNf5-byTSk |
 
 ## 看板犬・看板猫の紹介枠で追加した写真
 
@@ -84,3 +79,15 @@
 | hero-dog-cat.jpg | はじめてのお迎えガイドの記事・トップの入口 |
 | dog-treats.jpg | キャンペーン「先着50名様プレゼント」 |
 | senior-cat-sleeping.jpg | イベント「マッサージ体験会」 |
+
+## TOPスライダー（制作側が作成・2026-11-27 差し替え）
+
+元ファイルは `画像/TOPスライダー/`（GitHubには送らない）。PC用の横長（2400×1350）のみ。スマホは同じ写真の中央を切り抜いて表示。
+
+| ファイル（src/assets/photos/） | 内容 | 元ファイル |
+|---|---|---|
+| slide-01.jpg | 白いベッドに並んで眠る5匹の子犬 | 1枚目.png |
+| slide-02.jpg | 青い水玉のマグカップに入った茶白の子猫 | 2枚目.png |
+| slide-03.jpg | ソファの背に並ぶ5匹の茶白の子猫 | 3枚目.png |
+| slide-04.jpg | 毛糸玉の上のシベリアンハスキーの子犬 | 4枚目.png |
+| slide-05.jpg | 寄りそって寝そべるゴールデンレトリバーとグレーの猫 | 5枚目.png |

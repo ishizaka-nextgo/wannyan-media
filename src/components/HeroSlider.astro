@@ -1,21 +1,21 @@
 ---
 // B案：トップの全画面スライダー。写真をゆっくりズームしながら切り替え、縦書きのコピーを重ねる
 // 写真の差し替え：img＝PC用の横長、imgSp＝スマホ用の縦長（なければ img を切り抜いて使う）
-// sec＝その写真を見せる秒数。テンポよく切り替えて目を引くため、前ほど短くし0.5秒ずつのばす。コピーは約0.6秒で出そろう
+// sec＝その写真を見せる秒数。テンポよく切り替えて目を引くため、前ほど短くし、後ろへいくほどのばす。コピーは約0.6秒で出そろう
 import { getImage } from 'astro:assets';
-import puppy from '../assets/photos/slide-puppy-sleep.jpg';
-import catSun from '../assets/photos/slide-cat-sunbath.jpg';
-import seniorLab from '../assets/photos/slide-senior-lab.jpg';
-import catWindow from '../assets/photos/slide-cat-window.jpg';
-import dogCurtain from '../assets/photos/slide-dog-curtain.jpg';
+import s1 from '../assets/photos/slide-01.jpg';
+import s2 from '../assets/photos/slide-02.jpg';
+import s3 from '../assets/photos/slide-03.jpg';
+import s4 from '../assets/photos/slide-04.jpg';
+import s5 from '../assets/photos/slide-05.jpg';
 
 type Slide = { img: ImageMetadata; imgSp?: ImageMetadata; alt: string; copy: string[]; label: string; href: string; pos: string; sec: number };
 const slides: Slide[] = [
-  { img: puppy, alt: 'ベッドで眠るゴールデンレトリバーの子犬', copy: ['おやすみの顔を、', 'あしたも見られるように。'], label: '毎日のごはん', href: '/category/food/', pos: '60% 50%', sec: 1 },
-  { img: catSun, alt: '日だまりの床に座ってこちらを見る茶白の猫', copy: ['ひだまりの特等席は、', 'いつも、あの子のもの。'], label: '暮らし・住まい', href: '/category/living/', pos: '82% 50%', sec: 1.5 },
-  { img: seniorLab, alt: 'ラグの上に伏せるシニアのラブラドール', copy: ['ゆっくり歩く日も、', 'となりにいたい。'], label: 'シニアケア', href: '/category/senior/', pos: '72% 50%', sec: 2 },
-  { img: catWindow, alt: '窓辺の日なたで体をのばす猫', copy: ['なにもしない午後が、', 'いちばんのごちそう。'], label: 'シニア猫の食事', href: '/articles/senior-cat-appetite/', pos: '45% 50%', sec: 2.5 },
-  { img: dogCurtain, alt: 'カーテンに映る垂れ耳の犬の影', copy: ['あの子のことなら、', 'なんでも知りたい。'], label: 'このメディアについて', href: '/about/', pos: '55% 50%', sec: 3 },
+  { img: s1, alt: '白いベッドに並んで眠る5匹の子犬', copy: ['おやすみの顔を、', 'あしたも見られるように。'], label: '毎日のごはん', href: '/category/food/', pos: '50% 50%', sec: 1.5 },
+  { img: s2, alt: '水玉もようの青いマグカップから顔を出す茶白の子猫', copy: ['お気に入りの特等席は、', 'いつも、あの子のもの。'], label: '暮らし・住まい', href: '/category/living/', pos: '55% 50%', sec: 1.5 },
+  { img: s3, alt: 'ソファの背に並んでこちらを見る5匹の茶白の子猫', copy: ['はじめましての日から、', 'ずっと、家族。'], label: 'はじめてのお迎えガイド', href: '/articles/welcome-guide/', pos: '55% 50%', sec: 2 },
+  { img: s4, alt: '毛糸玉の上で眠そうにしているシベリアンハスキーの子犬', copy: ['その子らしさを、', '知ることから。'], label: '犬種・猫種図鑑', href: '/breeds/', pos: '50% 50%', sec: 2.5 },
+  { img: s5, alt: '床に寄りそって寝そべるゴールデンレトリバーとグレーの猫', copy: ['あの子のことなら、', 'なんでも知りたい。'], label: 'このメディアについて', href: '/about/', pos: '52% 50%', sec: 3 },
 ];
 const pics = await Promise.all(slides.map(async (s) => ({
   pc: await getImage({ src: s.img, widths: [1080, 1600, 2400], format: 'webp' }),

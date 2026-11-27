@@ -25,3 +25,4 @@ pnpm-debug.log*
 
 # 元の動画（サイト用は public/videos/ に入れる）
 /動画/
+/画像/
